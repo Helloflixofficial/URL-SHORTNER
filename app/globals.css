@@ -1,5 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Sacramento&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Play:wght@700&display=swap");
 @tailwind base;
@@ -21,16 +20,56 @@
   padding: 0;
   box-sizing: border-box;
 }
-.BOBY{
+
+.BOBY {
+  position: relative;
+  left: 25px;
+  down: 100px;
   color: transparent;
   background-clip: text;
-  background-position: center;
+  /* background-position: center; */
   background-size: cover;
-  font-family: 'Cedarville Cursive';
+  font-family: "Sacramento", cursive;
   background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
-
 }
+
+img {
+  /* width:100%; */
+  border-radius: 40%;
+  position: relative;
+  left: 10px;
+}
+
+.JI {
+  color: green;
+  font-weight: 500;
+}
+
+.LOGO {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  nav-up: 10px;
+}
+
+.Logo {
+  max-width: fit-content;
+  font-size: 14px;
+  letter-spacing: 3px;
+  background: #34495e;
+  font-weight: 500;
+  color: #fff;
+  position: relative;
+  left: 38px;
+}
+.Backup {
+  background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
+}
+
 .Sharmaji {
+  font-family: "Handjet", cursive;
+  position: relative;
+  left: 10px;
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
@@ -38,12 +77,14 @@
   background-size: cover;
   background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
 }
+
 /* Navbar */
 .navbar {
   @apply py-3 px-6
   /* gap-4
   border-b; */;
 }
+
 .Link {
   @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium;
 }

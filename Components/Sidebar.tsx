@@ -38,12 +38,11 @@ export const Sidebar = () => {
             overflow-hidden md:relative fixed
          h-screen"
         >
-          <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
-            <img
+          <div className="Profile flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
+            <img 
               src="https://avatars.githubusercontent.com/u/73479034?v=4"
               width={45}
               alt="logo"
-              className="profile"
             />
             <span className="text-xl whitespace-pre Sharmaji">Sharmaji</span>
           </div>
@@ -64,7 +63,7 @@ export const Sidebar = () => {
                   products
                 </small>
                 {subMenusList?.map((menu) => (
-                  <div key={menu.name}  className="flex flex-col gap-1">
+                  <div key={menu.name} className="flex flex-col gap-1">
                     <SubMenu data={menu} />
                   </div>
                 ))}
