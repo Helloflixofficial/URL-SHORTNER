@@ -1,5 +1,3 @@
-import { AiOutlineHome } from "react-icons/ai";
-import { SlSettings } from "react-icons/sl";
 import { BsPerson } from "react-icons/bs";
 import { HiOutlineDatabase } from "react-icons/hi";
 import { AiOutlineAppstore } from "react-icons/ai";
@@ -22,13 +20,11 @@ export const sidebarData = [
     icon: BsPerson,
   },
   {
-    name: "Status",
-    url: "/status",
+    name: "Contect",
+    url: "/contect",
     icon: BsPerson,
   },
-  
 ];
-
 
 export const subMenusList = [
   {

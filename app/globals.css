@@ -15,10 +15,31 @@
     @apply text-xl font-medium capitalize;
   }
 }
-* {
+.BODY {
+  color: transparent;
+  background-repeat: no-repeat;
+  background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  position:fixed; 
+  /* immmmmp */
+}
+
+
+
+.MainMove {
+  padding: 0%;
+  margin: 0%;
+  position: relative;
+  bottom: 777px;
+  left: 260px;
+  /* position:fixed; */
+
+}
+
+.mainwork{
+  position: fixed;
 }
 
 .BOBY {
@@ -27,7 +48,6 @@
   down: 100px;
   color: transparent;
   background-clip: text;
-  /* background-position: center; */
   background-size: cover;
   font-family: "Sacramento", cursive;
   background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
@@ -80,7 +100,16 @@ img {
 
 /* Navbar */
 .navbar {
+  position: relative;
+}
+
+.CON {
+  @apply w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300;
+}
+
+.navbar {
   @apply py-3 px-6
+
   /* gap-4
   border-b; */;
 }
