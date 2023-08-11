@@ -16,17 +16,8 @@
   }
 }
 .BODY {
-  color: transparent;
-  background-repeat: no-repeat;
-  background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  position:fixed; 
-  /* immmmmp */
+  position:sticky;
 }
-
-
 
 .MainMove {
   padding: 0%;
@@ -34,30 +25,21 @@
   position: relative;
   bottom: 777px;
   left: 260px;
-  /* position:fixed; */
 
-}
-
-.mainwork{
-  position: fixed;
 }
 
 .BOBY {
   position: relative;
-  left: 25px;
-  down: 100px;
   color: transparent;
   background-clip: text;
   background-size: cover;
-  font-family: "Sacramento", cursive;
+  font-family: "Sacramento";
   background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
 }
 
 img {
-  /* width:100%; */
   border-radius: 40%;
   position: relative;
-  left: 10px;
 }
 
 .JI {
@@ -69,7 +51,6 @@ img {
   padding: 0;
   margin: 0;
   position: relative;
-  nav-up: 10px;
 }
 
 .Logo {
@@ -82,25 +63,22 @@ img {
   position: relative;
   left: 38px;
 }
-.Backup {
-  background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
-}
+
 
 .Sharmaji {
-  font-family: "Handjet", cursive;
+  font-family: "Handjet";
   position: relative;
   left: 10px;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  background-position: center;
-  background-size: cover;
-  background-image: url(https://c4.wallpaperflare.com/wallpaper/974/565/254/windows-11-windows-10-minimalism-hd-wallpaper-preview.jpg);
 }
 
 /* Navbar */
 .navbar {
   position: relative;
+}
+
+
+.Bcolor{
+@apply  text-teal-500 py-1.5 px-3 text-xs bg-teal-50 rounded-xl
 }
 
 .CON {
@@ -109,9 +87,6 @@ img {
 
 .navbar {
   @apply py-3 px-6
-
-  /* gap-4
-  border-b; */;
 }
 
 .Link {

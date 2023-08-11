@@ -1,44 +1,88 @@
 "use client";
-import Image from "next/image";
+import { useRef } from "react";
+import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
+import { MdMenu } from "react-icons/md";
 import { subMenusList, sidebarData } from "./sidebardata";
 import { IoIosArrowBack } from "react-icons/io";
 import { SlSettings } from "react-icons/sl";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SubMenu } from "./SubMenu";
+import { useRouter } from "next/router";
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const Animation = {
-    open: {
-      x: 0,
-      width: "16rem",
-      transition: {
-        damping: 40,
-      },
-    },
-    closed: {
-      x: -250,
-      width: 0,
-      transition: {
-        damping: 40,
-        delay: 0.15,
-      },
-    },
-  };
+  const router = useRouter;
+  const { pathname } = router;
+
+  let isTab = useMediaQuery({ query: "(max-width 768px)" });
+  console.log(isTab, "working");
+  const [open, setOpen] = useState(isTab ? false : true);
+  const sidebarRef = useRef();
+
+  useEffect(() => {
+    if (isTab) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
+  }, [isTab]);
+
+  useEffect(() => {
+    isTab && setOpen(false);
+  }, [pathname]);
+
+  const Animation = isTab
+    ? {
+        open: {
+          x: 0,
+          width: "16rem",
+          transition: {
+            damping: 40,
+          },
+        },
+        closed: {
+          x: -250,
+          width: 0,
+          transition: {
+            damping: 40,
+            delay: 0.15,
+          },
+        },
+      }
+    : {
+        open: {
+          width: "16rem",
+          transition: {
+            damping: 40,
+          },
+        },
+        closed: {
+          width: "4rem",
+          transition: {
+            damping: 40,
+          },
+        },
+      };
 
   return (
     <>
-      <div className="BODY">
+      <div>
+      <div
+        onClick={() => setOpen(false)}
+        className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
+          open ? "block" : "hidden"
+        } `}
+      ></div>
         <motion.div
+          ref={sidebarRef}
           variants={Animation}
-          animate={isOpen ? "open" : "close"}
-          className=" bg-white text-gray shadow-xl z-[999] max-w-[16rem]  w-[16rem]
-            overflow-hidden md:relative fixed
-         h-screen"
+          initial={{ x: isTab ? -250 : 0 }}
+          animate={open ? "open" : "closed"}
+          className=" bg-white text-gray shadow-xl z-[999] max-w-[16rem]  w-[16rem] 
+              overflow-hidden md:relative fixed
+           h-screen "
         >
-         
-         {/* logo of me */}
+          {/* logo of me */}
           <div className="Profile flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
             <img
               src="https://avatars.githubusercontent.com/u/73479034?v=4"
@@ -46,7 +90,6 @@ export const Sidebar = () => {
               alt="logo"
             />
             <span className="text-xl whitespace-pre Sharmaji">Sharmaji</span>
-            
           </div>
           {/* //////////this on is menu //////// */}
           <div className="flex flex-col h-full">
@@ -59,10 +102,11 @@ export const Sidebar = () => {
                   </Link>
                 </li>
               ))}
-              {/* ///submenus///// */}
+              {/* sub menu */}
+              {(open || isTab) && (
               <div className="border-y py-5 border-slate-300 ">
                 <small className="pl-3 text-slate-500 inline-block mb-2">
-                  products
+                  Product categories
                 </small>
                 {subMenusList?.map((menu) => (
                   <div key={menu.name} className="flex flex-col gap-1">
@@ -70,38 +114,57 @@ export const Sidebar = () => {
                   </div>
                 ))}
               </div>
-
-              <li>
+            )}
+            <li>
                 <Link href={"/settings"} className="Link">
                   <SlSettings size={23} className="min-w-max" />
                   Settings
                 </Link>
               </li>
             </ul>
+
+            {/* new part of Animation */}
+            {open && (
+              <div className="flex-1 text-sm z-50  max-h-48 my-auto  whitespace-pre   w-full  font-medium  ">
+                <div className="flex border-y border-slate-300 p-4 items-center justify-between">
+                  <div>
+                    <p>Spark</p>
+                    <small>No-cost $0/month</small>
+                  </div>
+                  <p className="text-teal-500 py-1.5 px-3 text-xs bg-teal-50 rounded-xl">
+                    Upgrade
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           {/* ////////////////// */}
           <motion.div
+            onClick={() => {
+              setOpen(!open);
+            }}
             animate={
-              isOpen
+              open
                 ? {
-                    x: 195,
+                    x: 0,
                     y: 0,
+                    rotate: 0,
                   }
                 : {
                     x: -10,
-                    y: 10,
+                    y: -200,
                     rotate: 180,
                   }
             }
-            transition={{
-              duration: 0,
-            }}
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3 "
+            transition={{ duration: 0 }}
+            className="absolute w-fit h-fit md:block z-50 hidden right-2 bottom-3 cursor-pointer"
           >
             <IoIosArrowBack size={25} />
           </motion.div>
         </motion.div>
+        <div className="m-3 md:hidden" onClick={() => setOpen(true)}>
+          <MdMenu size={25} />
+        </div>
       </div>
     </>
   );

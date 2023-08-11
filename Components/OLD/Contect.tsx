@@ -1,6 +1,7 @@
 import { NextPage } from "next";
 const Contact: NextPage = () => {
   return (
+    // https://freefrontend.com/css-logos/
     <div className=" Move flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
       <form className="w-96">
