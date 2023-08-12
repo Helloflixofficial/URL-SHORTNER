@@ -76,6 +76,11 @@ img {
   position: relative;
 }
 
+.Arrow{
+position:relative;
+bottom: 150px;
+}
+
 
 .Bcolor{
 @apply  text-teal-500 py-1.5 px-3 text-xs bg-teal-50 rounded-xl
