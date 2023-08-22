@@ -3,10 +3,11 @@ import { HiOutlineDatabase } from "react-icons/hi";
 import { AiOutlineAppstore } from "react-icons/ai";
 import { RiBuilding3Line } from "react-icons/ri";
 import { TbReportAnalytics } from "react-icons/tb";
+import {BiBarChartAlt} from "react-icons/bi"
 export const sidebarData = [
   {
     name: "Home",
-    url: "/",
+    url: "/", 
     icon: AiOutlineAppstore,
   },
   {
@@ -17,11 +18,11 @@ export const sidebarData = [
   {
     name: "Authentication",
     url: "/authentication",
-    icon: BsPerson,
+    icon: BiBarChartAlt,
   },
   {
-    name: "Contect",
-    url: "/contect",
+    name: "Manage",
+    url: "/manage",
     icon: BsPerson,
   },
 ];

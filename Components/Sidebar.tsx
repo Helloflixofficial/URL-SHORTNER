@@ -2,7 +2,6 @@
 import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
-import { MdMenu } from "react-icons/md";
 import { subMenusList, sidebarData } from "./sidebardata";
 import { IoIosArrowBack } from "react-icons/io";
 import { SlSettings } from "react-icons/sl";
@@ -10,6 +9,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SubMenu } from "./SubMenu";
 import { useRouter } from "next/router";
+import { Navbar } from "./Navbar";
 export const Sidebar = () => {
   const router = useRouter;
   const { pathname } = router;
@@ -67,12 +67,13 @@ export const Sidebar = () => {
   return (
     <>
       <div>
-      <div
-        onClick={() => setOpen(false)}
-        className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
-          open ? "block" : "hidden"
-        } `}
-      ></div>
+        <Navbar/>
+        <div
+          onClick={() => setOpen(false)}
+          className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
+            open ? "block" : "hidden"
+          } `}
+        ></div>
         <motion.div
           ref={sidebarRef}
           variants={Animation}
@@ -104,18 +105,18 @@ export const Sidebar = () => {
               ))}
               {/* sub menu */}
               {(open || isTab) && (
-              <div className="border-y py-5 border-slate-300 ">
-                <small className="pl-3 text-slate-500 inline-block mb-2">
-                  Product categories
-                </small>
-                {subMenusList?.map((menu) => (
-                  <div key={menu.name} className="flex flex-col gap-1">
-                    <SubMenu data={menu} />
-                  </div>
-                ))}
-              </div>
-            )}
-            <li>
+                <div className="border-y py-5 border-slate-300 ">
+                  <small className="pl-3 text-slate-500 inline-block mb-2">
+                    Product categories
+                  </small>
+                  {subMenusList?.map((menu) => (
+                    <div key={menu.name} className="flex flex-col gap-1">
+                      <SubMenu data={menu} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <li>
                 <Link href={"/settings"} className="Link">
                   <SlSettings size={23} className="min-w-max" />
                   Settings
@@ -162,9 +163,7 @@ export const Sidebar = () => {
             <IoIosArrowBack size={25} />
           </motion.div>
         </motion.div>
-        <div className="m-3 md:hidden" onClick={() => setOpen(true)}>
-          <MdMenu size={25} />
-        </div>
+        <div className="m-3 " onClick={() => setOpen(true)}></div>
       </div>
     </>
   );
