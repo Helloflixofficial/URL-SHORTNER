@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^4.23.2",
     "@headlessui/react": "^1.7.15",
+    "@next/font": "^13.4.19",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "20.4.2",
     "@types/react": "18.2.15",

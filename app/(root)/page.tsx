@@ -1,14 +1,19 @@
-
-const Home = () => {
+import { UserButton } from "@clerk/nextjs";
+export default function Home() {
   return (
     <div>
-      <section>
-        <h1>Category</h1>
-        <h1>Posts</h1>
-        <h1>LoadMore</h1>
-      </section>
-      <div></div>
+    <div>
     </div>
-  );
-};
-export default Home;
+    <section className="text-[red]">
+      <h1>Category</h1>
+      <h1>Posts</h1>
+      <h1>LoadMore</h1>
+    </section>
+    <div>
+      <UserButton afterSignOutUrl="/"/>
+    </div>
+  </div>
+  )
+}
+
+
