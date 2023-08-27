@@ -1,19 +1,11 @@
-import { UserButton } from "@clerk/nextjs";
+// import { UserButton } from "@clerk/nextjs";
+// <div>
+// <UserButton afterSignOutUrl="/"/>
+// </div>
 export default function Home() {
   return (
-    <div>
-    <div>
-    </div>
-    <section className="text-[red]">
-      <h1>Category</h1>
-      <h1>Posts</h1>
-      <h1>LoadMore</h1>
-    </section>
-    <div>
-      <UserButton afterSignOutUrl="/"/>
-    </div>
-  </div>
-  )
+    <>
+      <h1 className=" bg-gray-100 head-text text-left">Home</h1>
+    </>
+  );
 }
-
-

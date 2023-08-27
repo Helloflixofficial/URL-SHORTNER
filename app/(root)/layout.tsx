@@ -1,7 +1,11 @@
 import React from "react";
+import { Navbar } from "@/Components/Shared/Navbar";
+import { Footer } from "@/Components/Shared/Footer";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "../globals.css";
+import { LeftSidebar } from "@/Components/Shared/LeftSidebar";
+import { RightSidebar } from "@/Components/Shared/Rightsidebar";
 const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Next.js",
@@ -16,7 +20,17 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} bg-dark-1`}>{children}</body>
+        <body className={`${inter.className} bg-dark-1`}>
+          <Navbar />
+          <RightSidebar />
+          <main>
+            <section className="main-container">
+              <div className="w-full max-w-4xl">{children}</div>
+            </section>
+          </main>
+          <LeftSidebar />
+          <Footer />
+        </body>
       </html>
     </ClerkProvider>
   );

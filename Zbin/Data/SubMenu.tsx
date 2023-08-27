@@ -5,7 +5,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
 import { sidebarData } from "./sidebardata";
 export const SubMenu = ({ data }) => {
- const [subMenusList, setSubMenusList] = useState(false);
+  const [subMenusList, setSubMenusList] = useState(false);
   return (
     <>
       <li

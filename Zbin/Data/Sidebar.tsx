@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SubMenu } from "./SubMenu";
 import { useRouter } from "next/router";
-import { Navbar } from "./Navbar";
 export const Sidebar = () => {
   const router = useRouter;
   const { pathname } = router;
@@ -67,7 +66,6 @@ export const Sidebar = () => {
   return (
     <>
       <div>
-        <Navbar/>
         <div
           onClick={() => setOpen(false)}
           className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
