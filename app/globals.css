@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Play:wght@700&display=swap");
 
-:root {
+/* :root {
   box-sizing: border-box;
 }
 
@@ -16,12 +16,12 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+} */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* 
 img {
   border-radius: 40%;
   position: relative;
@@ -35,7 +35,7 @@ img {
 
 .Link {
   @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium;
-}
+} */
 
 @layer components {
   /* main */

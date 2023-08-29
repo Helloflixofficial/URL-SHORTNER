@@ -5,7 +5,7 @@
 export default function Home() {
   return (
     <>
-      <h1 className=" bg-gray-100 head-text text-left">Home</h1>
+      <h1 className="head-text text-left">HOME</h1>
     </>
   );
 }

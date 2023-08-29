@@ -1,7 +1,9 @@
-export function RightSidebar() {
+import React from 'react'
+
+const Rightsidebar = () => {
   return (
-    <div>
-    <h1>hello Rightbar</h1>
-    </div>
+    <div>Rightsidebar</div>
   )
-};
+}
+
+export default Rightsidebar
