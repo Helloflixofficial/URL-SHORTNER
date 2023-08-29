@@ -4,8 +4,8 @@ import { Footer } from "@/Components/Shared/Footer";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "../globals.css";
-import { LeftSidebar } from "@/Components/Shared/LeftSidebar";
-import Rightsidebar from "@/Components/Shared/Rightsidebar";
+import { LeftSidebar }  from "@/Components/Shared/LeftSidebar";
+import { Rightsidebar } from "@/Components/Shared/RightSidebar";
 const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Next.js",

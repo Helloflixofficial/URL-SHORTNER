@@ -1,9 +1,7 @@
 import React from 'react'
 
-const Rightsidebar = () => {
+export const Rightsidebar = () => {
   return (
     <div>Rightsidebar</div>
   )
 }
-
-export default Rightsidebar
