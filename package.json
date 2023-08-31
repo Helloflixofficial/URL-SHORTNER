@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.23.2",
+    "@clerk/themes": "^1.7.5",
     "@headlessui/react": "^1.7.15",
     "@next/font": "^13.4.19",
     "@types/jsonwebtoken": "^9.0.2",

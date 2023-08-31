@@ -1,7 +1,8 @@
-export async function page() {
+async function page() {
   return (
-    <main className="text-[red]">
-      <h1 className="head-text">onBoarding paths this works or not idk</h1>
-    </main>
-  );
+    <h1 className="bg-black head-text">
+    onBoarding paths this works or not idk
+  </h1>
+  )
 }
+export default page
