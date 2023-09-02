@@ -12,7 +12,10 @@
     "@clerk/nextjs": "^4.23.2",
     "@clerk/themes": "^1.7.5",
     "@headlessui/react": "^1.7.15",
+    "@hookform/resolvers": "^3.3.1",
     "@next/font": "^13.4.19",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-slot": "^1.0.2",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "20.4.2",
     "@types/react": "18.2.15",
@@ -32,6 +35,7 @@
     "postcss": "8.4.26",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.45.4",
     "react-icons": "^4.10.1",
     "react-responsive": "^9.0.2",
     "svix": "^1.8.1",
@@ -39,7 +43,8 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.1.6",
-    "uploadthing": "^5.3.2"
+    "uploadthing": "^5.3.2",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@grafbase/sdk": "^0.2.1"
