@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserValidation } from "@/lib/validation/user";
 import * as z from "zod";
@@ -15,6 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
+import { ChangeEvent } from "react";
+import { ValueOf } from "next/dist/shared/lib/constants";
 
 interface props {
   user: {
@@ -42,12 +45,19 @@ export const AccountProfile = ({ user, btnTitle }) => {
       bio: "",
     },
   });
+ 
+  const handleImage = (e:ChangeEvent,fieldChange: (Value: string) => void) => {
+    e.preventDefault();
+  }
+
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col justify-start gap-10"
       >
+        {/* ///////////////Profile_Image///////////////// */}
         <FormField
           control={form.control}
           name="profile_photo"
@@ -73,11 +83,70 @@ export const AccountProfile = ({ user, btnTitle }) => {
                   />
                 )}
               </FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your name" {...field} />
+              <FormControl className="flex-1 text-base-semibold text-gray-200">
+                <Input type="file" 
+                accept="image/*"
+                placeholder="Upload image"
+                className="account-form_image-input"
+                onChange={(e) => handleImage(e , field.onChange)}/>
               </FormControl>
-              <FormDescription>YOUR NAME</FormDescription>
-              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* ////////////Name/////////// */}
+        <FormField
+          control={form.control}
+          name="Name"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-4 w-full">
+              <FormLabel className="text-[white] account-form_image-label">
+               Name
+              </FormLabel>
+              <FormControl className="text-base-semibold text-gray-200">
+                <Input 
+                type="text"
+                className="account-form_input no-focus"
+                {...field} 
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {/* ////////////Username/////////// */}
+        <FormField
+          control={form.control}
+          name="Username"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-4 w-full">
+              <FormLabel className="text-[white] account-form_image-label">
+               Username
+              </FormLabel>
+              <FormControl className="text-base-semibold text-gray-200">
+                <Input 
+                type="text"
+                className="account-form_input no-focus"
+                {...field} 
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {/* //////////////BIO//////////////// */}
+        <FormField
+          control={form.control}
+          name="Bio"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-4 w-full">
+              <FormLabel className="text-[white] account-form_image-label">
+               Bio
+              </FormLabel>
+              <FormControl className="text-base-semibold text-gray-200">
+                <Textarea 
+                  rows={10}
+                className="account-form_input no-focus"
+                {...field} 
+                />
+              </FormControl>
             </FormItem>
           )}
         />
