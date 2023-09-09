@@ -99,7 +99,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
           name="Name"
           render={({ field }) => (
             <FormItem className="flex items-center gap-4 w-full">
-              <FormLabel className="text-[white] account-form_image-label">
+              <FormLabel className="text-base-semibold text-light-2">
                Name
               </FormLabel>
               <FormControl className="text-base-semibold text-gray-200">
@@ -118,7 +118,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
           name="Username"
           render={({ field }) => (
             <FormItem className="flex items-center gap-4 w-full">
-              <FormLabel className="text-[white] account-form_image-label">
+              <FormLabel className="text-base-semibold text-light-2">
                Username
               </FormLabel>
               <FormControl className="text-base-semibold text-gray-200">
@@ -137,7 +137,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
           name="Bio"
           render={({ field }) => (
             <FormItem className="flex items-center gap-4 w-full">
-              <FormLabel className="text-[white] account-form_image-label">
+              <FormLabel className="text-base-semibold text-light-2">
                Bio
               </FormLabel>
               <FormControl className="text-base-semibold text-gray-200">
