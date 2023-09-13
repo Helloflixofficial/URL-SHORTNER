@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { ValueOf } from "next/dist/shared/lib/constants";
 interface props {
   user: {
@@ -35,6 +35,7 @@ function onSubmit(values: z.infer<typeof UserValidation>) {
 }
 
 export const AccountProfile = ({ user, btnTitle }) => {
+  const [files, setFiles] = useState<File[]>([]);
   const form = useForm({
     resolver: zodResolver(UserValidation),
     defaultValues: {
@@ -46,10 +47,21 @@ export const AccountProfile = ({ user, btnTitle }) => {
   });
 
   const handleImage = (
-    e: ChangeEvent,
+    e: ChangeEvent<HTMLAnchorElement>,
     fieldChange: (Value: string) => void
   ) => {
     e.preventDefault();
+    const fileReader = new FileReader();
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setFiles(Array.from(e.target.files));
+      if (!file.type.includes("image")) return;
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        fieldChange(imageDataUrl);
+      };
+      fileReader.readAsDataURL(file);
+    };
   };
 
   return (
@@ -64,13 +76,13 @@ export const AccountProfile = ({ user, btnTitle }) => {
           name="profile_photo"
           render={({ field }) => (
             <FormItem className="flex items-center gap-4">
-              <FormLabel className=" account-form_image-label">
+              <FormLabel className="account-form_image-label">
                 {field.value ? (
                   <Image
                     src={field.value}
                     alt="profile photo"
-                    width={25}
-                    height={24}
+                    width={96}
+                    height={96}
                     priority
                     className="rounded-full object-contain"
                   />
@@ -99,7 +111,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
         {/* ////////////Name/////////// */}
         <FormField
           control={form.control}
-          name="Name"
+          name="name"
           render={({ field }) => (
             <FormItem className="flex-col gap-3 w-full">
               <FormLabel className="text-base-semibold text-light-2">
@@ -118,7 +130,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
         {/* ////////////Username/////////// */}
         <FormField
           control={form.control}
-          name="Username"
+          name="username"
           render={({ field }) => (
             <FormItem className="flex-col gap-4 w-full">
               <FormLabel className="text-base-semibold text-light-2">
@@ -137,7 +149,7 @@ export const AccountProfile = ({ user, btnTitle }) => {
         {/* //////////////BIO//////////////// */}
         <FormField
           control={form.control}
-          name="Bio"
+          name="bio"
           render={({ field }) => (
             <FormItem className="flex-col gap-4 w-full">
               <FormLabel className="text-base-semibold text-light-2">
