@@ -18,6 +18,8 @@ import {
 import Image from "next/image";
 import { ChangeEvent, useState } from "react";
 import { ValueOf } from "next/dist/shared/lib/constants";
+import { isBase64Image } from "@/lib/utils";
+import { useUploadThing } from "@/lib/validation/uploadthing";
 interface props {
   user: {
     id: string;
@@ -30,11 +32,8 @@ interface props {
   btnTitle: string;
 }
 
-function onSubmit(values: z.infer<typeof UserValidation>) {
-  console.log(values);
-}
-
 export const AccountProfile = ({ user, btnTitle }) => {
+  const { startUpload } = useUploadThing("media");
   const [files, setFiles] = useState<File[]>([]);
   const form = useForm({
     resolver: zodResolver(UserValidation),
@@ -61,7 +60,19 @@ export const AccountProfile = ({ user, btnTitle }) => {
         fieldChange(imageDataUrl);
       };
       fileReader.readAsDataURL(file);
-    };
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    const blob = values.profile_photo;
+    const hasImageChanged = isBase64Image(blob);
+    if (hasImageChanged) {
+      const imgRes = await startUpload(files);
+      if (imgRes && imgRes[0].fileUrl) {
+        values.profile_photo = imgRes[0].fileUrl;
+      }
+    }
+    //  TODO: Update user profile
   };
 
   return (
