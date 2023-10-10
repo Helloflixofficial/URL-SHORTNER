@@ -1,25 +1,17 @@
-"use server"
-import dotenv from "dotenv"
-dotenv.config();
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 let isConnected = false;
-export const ConnectToDB = async () => {
+export const connectToDB = async () => {
+  mongoose.set("strictQuery", true);
+  if (!process.env.MONGODB_URL) return console.log("Missing MongoDB URL");
   if (isConnected) {
     console.log("MongoDB connection already established");
     return;
   }
   try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error("Missing MongoDB URI");
-    }
-    // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URL);
     isConnected = true;
-    console.log("MongoDB connection established");
+    console.log("MongoDB connected");
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.log(error);
   }
 };
