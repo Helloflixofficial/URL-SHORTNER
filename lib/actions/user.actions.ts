@@ -6,10 +6,9 @@ import Thread from "../models/thread.model";
 import User from "../models/user.models";
 import { connectToDB } from "../mongoose";
 
-export async function fetchUser(userId: string) {
+export async function fetchUser(userId : string) {
   try {
     connectToDB();
-
     return await User.findOne({ id: userId }).populate({
       path: "communities",
       model: Community,
