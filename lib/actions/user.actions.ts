@@ -27,6 +27,9 @@ interface Params {
   path: string;
 }
 
+
+
+
 export async function updateUser({
   userId,
   bio,
@@ -58,6 +61,16 @@ export async function updateUser({
   }
 }
 
+
+
+
+
+
+
+
+
+
+// this one working fne 
 export async function fetchUserPosts(userId: string) {
   try {
     connectToDB();

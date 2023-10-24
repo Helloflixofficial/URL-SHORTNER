@@ -12,6 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/Components/ui/form";
 import Image from "next/image";
 import { ChangeEvent, useState } from "react";
@@ -151,6 +152,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -170,6 +172,7 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
           )}
         />
@@ -189,7 +192,9 @@ export const AccountProfile = ({ user, btnTitle }: Props) => {
                   {...field}
                 />
               </FormControl>
+              <FormMessage/>
             </FormItem>
+            
           )}
         />
         <Button type="submit" className="bg-primary-5000">
