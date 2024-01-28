@@ -18,6 +18,8 @@ git push -u origin main
 ## Getting Started
 First, run the development server:
 ```bash
+cd project-name
+npm i
 npm run dev
 # or
 yarn dev
