@@ -1,0 +1,310 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  member
+}
+
+enum UserStatus {
+  active
+  inactive
+  banned
+}
+
+enum LinkStatus {
+  active
+  inactive
+  deleted
+}
+
+enum AdType {
+  none       // 0 - Direct
+  interstitial // 1
+  banner     // 2
+  random     // 3 - Randomly interstitial or banner
+  popup      // 4
+}
+
+enum CampaignStatus {
+  pending
+  active
+  paused
+  completed
+  rejected
+}
+
+enum WithdrawalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum InvoiceStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum PageStatus {
+  published
+  draft
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  username         String           @unique
+  email            String           @unique
+  emailVerified    DateTime?
+  password         String?
+  role             UserRole         @default(member)
+  status           UserStatus       @default(active)
+  balance          Float            @default(0)
+  totalEarned      Float            @default(0)
+  referralId String? @db.ObjectId
+  disableEarnings  Boolean          @default(false)
+  avatar           String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resetToken       String?
+  resetTokenExpiry DateTime?
+
+  links            Link[]
+  statistics       Statistic[]
+  campaigns        Campaign[]
+  withdrawals      Withdrawal[]
+  invoices         Invoice[]
+  socialProfiles   SocialProfile[]
+  rememberTokens   RememberToken[]
+  userPlan         UserPlan?
+  referrer User? @relation("Referrals", fields: [referralId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  referrals        User[]           @relation("Referrals")
+}
+
+model Link {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  url         String
+  alias       String     @unique
+  title       String?
+  description String?
+  adType      Int        @default(1) // 0=direct,1=interstitial,2=banner,3=random
+  status      Int        @default(1) // 1=active,2=inactive,3=deleted
+  hits        Int        @default(0)
+  expiration  DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id])
+  statistics  Statistic[]
+
+  
+  @@index([userId])
+}
+
+model Statistic {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  linkId String @db.ObjectId
+  userId String @db.ObjectId
+  ip               String
+  country          String   @default("Others")
+  device           Int      @default(2) // 1=all,2=desktop,3=mobile
+  adType           Int      @default(1)
+  reason           Int      @default(1) // see earnings engine
+  advertiserPrice  Float    @default(0)
+  publisherPrice   Float    @default(0)
+  campaignId String? @db.ObjectId
+  campaignUserId String? @db.ObjectId
+  campaignItemId String? @db.ObjectId
+  refererUrl       String?
+  createdAt        DateTime @default(now())
+
+  link             Link     @relation(fields: [linkId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
+
+  @@index([linkId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([country])
+}
+
+model Campaign {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  name             String
+  websiteUrl       String
+  adType           Int            @default(1) // 1=interstitial,2=banner,3=popup
+  bannerSize       String?        // "728x90","468x60","336x280"
+  bannerCode       String?
+  budget           Float          @default(0)
+  spent            Float          @default(0)
+  trafficSource    Int            @default(1) // 1=all,2=desktop,3=mobile
+  defaultCampaign  Boolean        @default(false)
+  status           Int            @default(0) // 0=pending,1=active,2=paused,3=completed,4=rejected
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  user             User           @relation(fields: [userId], references: [id])
+  campaignItems    CampaignItem[]
+}
+
+model CampaignItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  campaignId String @db.ObjectId
+  country         String   @default("all")
+  weight          Float    @default(0) // 0-100 percentage fill
+  advertiserPrice Float    @default(0)
+  publisherPrice  Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  campaign        Campaign @relation(fields: [campaignId], references: [id])
+
+  @@index([campaignId])
+}
+
+model Plan {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String
+  price                 Float      @default(0)
+  linksLimit            Int        @default(-1) // -1 = unlimited
+  viewsHourlyLimit      Int        @default(0)  // 0 = unlimited
+  viewsDailyLimit       Int        @default(0)
+  viewsMonthlyLimit     Int        @default(0)
+  linkExpiration        Boolean    @default(false)
+  direct                Boolean    @default(false)
+  disableAds            Boolean    @default(false)
+  disableCaptcha        Boolean    @default(false)
+  onetimeCaptcha        Boolean    @default(false)
+  visitorsRemoveCaptcha Boolean    @default(false)
+  timer                 Int        @default(5)
+  isDefault             Boolean    @default(false)
+  features              String?    // JSON array of feature strings
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  userPlans             UserPlan[]
+}
+
+model UserPlan {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId       @unique
+  planId String @db.ObjectId
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id])
+  plan      Plan      @relation(fields: [planId], references: [id])
+}
+
+model Withdrawal {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  amount         Float
+  method         String           @default("paypal") // paypal, bank, crypto
+  accountDetails String
+  status         Int              @default(0) // 0=pending,1=approved,2=rejected
+  note           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  user           User             @relation(fields: [userId], references: [id])
+}
+
+model Invoice {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  amount    Float
+  method    String   @default("paypal")
+  status    Int      @default(0) // 0=pending,1=paid,2=failed,3=refunded
+  meta      String?  // JSON metadata (txn id, etc.)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Page {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  content     String
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     String
+  image       String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  avatar    String?
+  text      String
+  rating    Int      @default(5)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Announcement {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Option {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  value     String
+
+  
+}
+
+model SocialProfile {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  provider   String
+  providerId String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerId])
+}
+
+model RememberToken {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  
+}

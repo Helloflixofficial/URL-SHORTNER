@@ -1,0 +1,123 @@
+'use client'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { BarChart3, Globe, Monitor } from 'lucide-react'
+
+interface Props {
+  countryStats: { country: string; count: number }[]
+  deviceStats: { device: number; count: number }[]
+  dailyStats: { date: string; count: number }[]
+}
+
+const COLORS = ['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+const deviceLabel = (d: number) => ({ 2: 'Desktop', 3: 'Mobile/Tablet', 1: 'All' }[d] ?? 'Unknown')
+
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
+  if (active && payload?.length) {
+    return (
+      <div className="glass border border-border/50 rounded-xl px-3 py-2 text-sm">
+        <p className="text-muted-foreground">{label}</p>
+        <p className="font-bold text-primary">{payload[0].value.toLocaleString()} views</p>
+      </div>
+    )
+  }
+  return null
+}
+
+export default function StatsCharts({ countryStats, deviceStats, dailyStats }: Props) {
+  const deviceData = deviceStats.map(d => ({ name: deviceLabel(d.device), value: d.count }))
+  
+  // Group daily stats by date
+  const grouped: Record<string, number> = {}
+  for (const s of dailyStats) {
+    grouped[s.date] = (grouped[s.date] ?? 0) + s.count
+  }
+  const chartData = Object.entries(grouped)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-30)
+    .map(([date, count]) => ({ date: date.slice(5), count }))
+
+  return (
+    <div className="space-y-6">
+      {/* Daily chart */}
+      <Card className="glass border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <BarChart3 className="w-4 h-4 text-primary" /> Views — Last 30 Days
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} />
+              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="count" fill="url(#grad)" radius={[4, 4, 0, 0]} />
+              <defs>
+                <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#7c3aed" />
+                  <stop offset="100%" stopColor="#06b6d4" />
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Countries */}
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe className="w-4 h-4 text-primary" /> Top Countries
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {countryStats.slice(0, 8).map((c, i) => (
+                <div key={c.country} className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
+                  <span className="text-sm flex-1 font-medium">{c.country}</span>
+                  <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{
+                      width: `${(c.count / (countryStats[0]?.count ?? 1)) * 100}%`,
+                      background: 'var(--gradient-primary)',
+                    }} />
+                  </div>
+                  <span className="text-xs text-muted-foreground w-10 text-right">{c.count}</span>
+                </div>
+              ))}
+              {countryStats.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No data yet</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Devices */}
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Monitor className="w-4 h-4 text-primary" /> Device Types
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {deviceData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie data={deviceData} cx="50%" cy="50%" innerRadius={50} outerRadius={75}
+                    dataKey="value" nameKey="name">
+                    {deviceData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  </Pie>
+                  <Legend formatter={(v) => <span className="text-xs text-muted-foreground">{v}</span>} />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">No data yet</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
