@@ -23,7 +23,7 @@ export default async function AdminWithdrawalsPage({ searchParams }: { searchPar
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black font-display">
           <span className="gradient-text">Withdrawals</span>
         </h1>
         <p className="text-muted-foreground mt-1">{total} total requests</p>

@@ -112,6 +112,19 @@ export async function calcEarnings(
   // 6. IP changed
   if (cookieData.ip !== ip) return recordAndReturn(EARN_REASON.IP_CHANGED)
 
+  // 6.5. Not Unique (24h IP Check)
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  const existingPaidView = await prisma.statistic.findFirst({
+    where: {
+      userId: link.userId,
+      ip: ip,
+      reason: EARN_REASON.EARN,
+      createdAt: { gte: twentyFourHoursAgo },
+    },
+    select: { id: true },
+  })
+  if (existingPaidView) return recordAndReturn(EARN_REASON.NOT_UNIQUE)
+
   // 7. Adblock detected
   if (hasAdblock) return recordAndReturn(EARN_REASON.ADBLOCK)
 
@@ -136,6 +149,9 @@ export async function calcEarnings(
       prisma.campaignItem.update({ where: { id: data.cii }, data: { weight: { increment: 1 } } }),
     ])
 
+    // Referral Commission (Campaign)
+    await payReferrer(link.userId, pub)
+
     await recordAndReturn(EARN_REASON.EARN, pub, adv)
     return { status: 'success', message: '', url: redirectUrl }
   }
@@ -145,12 +161,41 @@ export async function calcEarnings(
     const pub = data.publisherPrice
     if (pub > 0) {
       await prisma.user.update({ where: { id: link.userId }, data: { balance: { increment: pub }, totalEarned: { increment: pub } } })
+      // Referral Commission (Simple)
+      await payReferrer(link.userId, pub)
     }
     await recordAndReturn(EARN_REASON.EARN, pub, 0)
     return { status: 'success', message: '', url: redirectUrl }
   }
 
   return recordAndReturn(EARN_REASON.EARN)
+}
+
+/**
+ * Helper to credit referral commission to the referrer.
+ */
+async function payReferrer(userId: string, amount: number) {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { referralId: true } })
+    if (!user?.referralId) return
+
+    const refPercentRaw = await prisma.option.findUnique({ where: { key: 'referral_percentage' } })
+    const refPercent = parseFloat(refPercentRaw?.value || '20')
+    const commission = amount * (refPercent / 100)
+
+    if (commission > 0) {
+      await prisma.user.update({
+        where: { id: user.referralId },
+        data: {
+          balance: { increment: commission },
+          totalEarned: { increment: commission },
+          referralEarnings: { increment: commission }
+        }
+      })
+    }
+  } catch (err) {
+    console.error('Referral payment error:', err)
+  }
 }
 
 /**

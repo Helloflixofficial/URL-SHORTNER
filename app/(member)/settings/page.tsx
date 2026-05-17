@@ -17,13 +17,13 @@ export default async function SettingsPage() {
   const userId = session.user.id!
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true, email: true, avatar: true, disableEarnings: true },
+    select: { id: true, username: true, email: true, avatar: true, disableEarnings: true, firstName: true, lastName: true, address1: true, address2: true, city: true, state: true, zip: true, country: true, withdrawalMethod: true, withdrawalAccount: true },
   })
   if (!user) redirect('/login')
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black font-display">
           Account <span className="gradient-text">Settings</span>
         </h1>
         <p className="text-muted-foreground mt-1">Manage your profile and preferences</p>

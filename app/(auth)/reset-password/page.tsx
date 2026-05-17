@@ -65,13 +65,13 @@ function ResetPasswordForm() {
         <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-8 h-8 text-emerald-500" />
         </div>
-        <h1 className="text-2xl font-black mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-2xl font-black mb-3 font-display">
           Password Reset!
         </h1>
         <p className="text-muted-foreground text-sm mb-6">
           Your password has been successfully updated. You can now sign in with your new password.
         </p>
-        <Link href="/login" className="inline-block w-full text-center py-2.5 rounded-xl btn-glow font-semibold text-white" style={{ background: 'var(--gradient-primary)' }}>
+        <Link href="/login" className="inline-block w-full text-center py-2.5 rounded-xl btn-glow font-semibold text-primary-foreground gradient-bg-primary text-primary-foreground">
           Continue to Sign In
         </Link>
       </div>
@@ -81,7 +81,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="glass rounded-3xl p-8 border border-border/50 text-center">
-        <h1 className="text-2xl font-black mb-3 text-destructive" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-2xl font-black mb-3 text-destructive">
           Invalid Link
         </h1>
         <p className="text-muted-foreground text-sm mb-6">
@@ -97,7 +97,7 @@ function ResetPasswordForm() {
   return (
     <div className="glass rounded-3xl p-8 border border-border/50">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black mb-2 font-display">
           New Password
         </h1>
         <p className="text-muted-foreground text-sm">Create a new, strong password</p>
@@ -141,8 +141,7 @@ function ResetPasswordForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-xl btn-glow font-semibold"
-          style={{ background: 'var(--gradient-primary)' }}
+          className="w-full h-11 rounded-xl btn-glow font-semibold gradient-bg-primary text-primary-foreground"
         >
           {loading ? (
             <span className="flex items-center gap-2">

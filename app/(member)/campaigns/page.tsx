@@ -23,12 +23,12 @@ export default async function CampaignsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-3xl font-black font-display">
             <span className="gradient-text">Campaigns</span>
           </h1>
           <p className="text-muted-foreground mt-1">Advertise your links across the network</p>
         </div>
-        <Button asChild className="btn-glow" style={{ background: 'var(--gradient-primary)' }}>
+        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
           <Link href="/campaigns/new"><Plus className="w-4 h-4 mr-2" />New Campaign</Link>
         </Button>
       </div>
@@ -39,7 +39,7 @@ export default async function CampaignsPage() {
             <Megaphone className="w-12 h-12 mx-auto mb-4 opacity-30" />
             <p className="font-medium">No campaigns yet</p>
             <p className="text-sm mt-1 mb-4">Create a campaign to advertise across the Linksite network</p>
-            <Button asChild className="btn-glow" style={{ background: 'var(--gradient-primary)' }}>
+            <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
               <Link href="/campaigns/new"><Plus className="w-4 h-4 mr-2" />Create Campaign</Link>
             </Button>
           </CardContent>

@@ -88,10 +88,10 @@ export default function InterstitialPage({
       {/* Bottom Bar */}
       <div className="h-16 flex items-center justify-between px-4 md:px-8 border-t border-border/40 bg-card z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--gradient-primary)' }}>
-            <Link2 className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center gradient-bg-primary">
+            <Link2 className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="hidden md:inline-block gradient-text font-bold text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <span className="hidden md:inline-block gradient-text font-bold text-xl font-display">
             Linksite
           </span>
         </div>
@@ -123,8 +123,7 @@ export default function InterstitialPage({
           <Button
             onClick={doRedirect}
             disabled={!canRedirect || redirecting}
-            className="h-10 px-6 rounded-lg text-sm font-semibold transition-all"
-            style={{ background: ready ? 'var(--gradient-primary)' : 'var(--color-muted)' }}
+            className={`h-10 px-6 rounded-lg text-sm font-semibold transition-all text-primary-foreground ${ready ? 'gradient-bg-primary' : 'bg-muted text-muted-foreground'}`}
           >
             {redirecting ? (
               <span className="flex items-center gap-2">

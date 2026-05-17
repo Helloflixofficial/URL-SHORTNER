@@ -21,7 +21,7 @@ export default async function StaticPage({ params }: { params: Promise<{ slug: s
         <Button asChild variant="ghost" className="mb-8 -ml-2 text-muted-foreground">
           <Link href="/"><ArrowLeft className="w-4 h-4 mr-2" />Back to Home</Link>
         </Button>
-        <h1 className="text-3xl md:text-5xl font-black mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl md:text-5xl font-black mb-8 font-display">
           {page.title}
         </h1>
         <div className="glass rounded-2xl border border-border/50 p-8">

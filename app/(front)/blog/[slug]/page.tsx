@@ -26,7 +26,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <BookOpen className="w-3.5 h-3.5" />
           <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-black mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl md:text-5xl font-black mb-8 font-display">
           {post.title}
         </h1>
         <div className="glass rounded-2xl border border-border/50 p-8">

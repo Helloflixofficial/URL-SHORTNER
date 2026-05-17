@@ -44,12 +44,12 @@ export default async function LinksPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-3xl font-black font-display">
             My <span className="gradient-text">Links</span>
           </h1>
           <p className="text-muted-foreground mt-1">{total} link{total !== 1 ? 's' : ''} total</p>
         </div>
-        <Button asChild className="btn-glow" style={{ background: 'var(--gradient-primary)' }}>
+        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
           <Link href="/links/new"><Plus className="w-4 h-4 mr-2" />New Link</Link>
         </Button>
       </div>

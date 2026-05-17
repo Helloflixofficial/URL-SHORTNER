@@ -39,7 +39,7 @@ export default function AdminSettingsForm({ options }: Props) {
   }
 
   const SaveBtn = ({ keys }: { keys: string[] }) => (
-    <Button onClick={() => save(keys)} disabled={saving} className="btn-glow" style={{ background: 'var(--gradient-primary)' }}>
+    <Button onClick={() => save(keys)} disabled={saving} className="btn-glow gradient-bg-primary text-primary-foreground">
       {saving ? 'Saving...' : <><Save className="w-4 h-4 mr-2" />Save Changes</>}
     </Button>
   )
@@ -47,8 +47,8 @@ export default function AdminSettingsForm({ options }: Props) {
   return (
     <Tabs defaultValue="general">
       <TabsList className="glass border border-border/50 p-1 h-auto flex-wrap gap-1">
-        {['general', 'ads', 'payouts', 'captcha', 'advanced'].map(t => (
-          <TabsTrigger key={t} value={t} className="capitalize text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg">
+        {['general', 'ads', 'payouts', 'referrals', 'captcha', 'advanced'].map(t => (
+          <TabsTrigger key={t} value={t} className="capitalize text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
             {t}
           </TabsTrigger>
         ))}
@@ -116,7 +116,13 @@ export default function AdminSettingsForm({ options }: Props) {
             <div className="space-y-1.5"><Label>Interstitial Banner Ad Code</Label>
               <Textarea value={vals.interstitial_banner_ad ?? ''} onChange={e => set('interstitial_banner_ad', e.target.value)} placeholder="<script>...ad code...</script>" className="glass border-border/50 font-mono text-xs resize-none" rows={4} /></div>
             <div className="space-y-1.5"><Label>Banner 728×90 Code</Label>
-              <Textarea value={vals.banner_728x90 ?? ''} onChange={e => set('banner_728x90', e.target.value)} placeholder="Ad code" className="glass border-border/50 font-mono text-xs resize-none" rows={3} /></div>
+              <Textarea value={vals.banner_728x90 ?? ''} onChange={e => set('banner_728x90', e.target.value)} placeholder="Leaderboard ad code" className="glass border-border/50 font-mono text-xs resize-none" rows={3} /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5"><Label>Banner 468×60 Code</Label>
+                <Textarea value={vals.banner_468x60 ?? ''} onChange={e => set('banner_468x60', e.target.value)} placeholder="Full banner code" className="glass border-border/50 font-mono text-xs resize-none" rows={3} /></div>
+              <div className="space-y-1.5"><Label>Banner 336×280 Code</Label>
+                <Textarea value={vals.banner_336x280 ?? ''} onChange={e => set('banner_336x280', e.target.value)} placeholder="Large rectangle code" className="glass border-border/50 font-mono text-xs resize-none" rows={3} /></div>
+            </div>
             <div className="flex items-center gap-3 p-4 glass rounded-xl border border-border/50">
               <Switch checked={vals.enable_publisher_earnings === '1'} onCheckedChange={() => toggle('enable_publisher_earnings')} />
               <div><p className="text-sm font-medium">Enable Publisher Earnings</p>
@@ -166,6 +172,20 @@ export default function AdminSettingsForm({ options }: Props) {
             <div className="space-y-1.5"><Label>reCAPTCHA Secret Key</Label>
               <Input type="password" value={vals.recaptcha_secret_key ?? ''} onChange={e => set('recaptcha_secret_key', e.target.value)} className="glass border-border/50" /></div>
             <SaveBtn keys={['enable_captcha', 'recaptcha_site_key', 'recaptcha_secret_key']} />
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      {/* Referrals */}
+      <TabsContent value="referrals">
+        <Card className="glass border-border/50">
+          <CardHeader><CardTitle>Referral Settings</CardTitle></CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-1.5"><Label>Referral Percentage (%)</Label>
+              <Input type="number" value={vals.referral_percentage ?? '20'} onChange={e => set('referral_percentage', e.target.value)} className="glass border-border/50 max-w-xs" />
+              <p className="text-xs text-muted-foreground mt-1">Percentage of earnings paid to the referrer (lifetime).</p>
+            </div>
+            <SaveBtn keys={['referral_percentage']} />
           </CardContent>
         </Card>
       </TabsContent>

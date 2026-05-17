@@ -2,7 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { formatDistanceToNow } from 'date-fns'
-import { Megaphone, CheckCircle, XCircle } from 'lucide-react'
+import { Megaphone } from 'lucide-react'
+import AdminCampaignAction from '@/components/admin/campaign-actions'
 
 export const metadata = { title: 'Admin — Campaigns' }
 
@@ -13,7 +14,7 @@ export default async function AdminCampaignsPage() {
   const campaigns = await prisma.campaign.findMany({ orderBy: { createdAt: 'desc' }, take: 50, include: { user: { select: { username: true } } } })
   return (
     <div className="space-y-6">
-      <div><h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}><span className="gradient-text">Campaigns</span></h1>
+      <div><h1 className="text-3xl font-black font-display"><span className="gradient-text">Campaigns</span></h1>
         <p className="text-muted-foreground mt-1">{campaigns.length} campaigns</p></div>
       {campaigns.length === 0 ? (
         <Card className="glass border-border/50"><CardContent className="py-12 text-center text-muted-foreground"><Megaphone className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>No campaigns yet</p></CardContent></Card>
@@ -31,12 +32,7 @@ export default async function AdminCampaignsPage() {
                   <p className="text-xs text-muted-foreground">spent ${c.spent.toFixed(2)}</p>
                 </div>
                 <span className={`text-xs font-semibold shrink-0 ${statusColor(c.status)}`}>{statusLabel(c.status)}</span>
-                {c.status === 0 && (
-                  <div className="flex gap-1 shrink-0">
-                    <form action={`/api/admin/campaigns/${c.id}/approve`} method="POST"><Button size="icon" variant="ghost" className="h-7 w-7 text-emerald-400"><CheckCircle className="w-4 h-4" /></Button></form>
-                    <form action={`/api/admin/campaigns/${c.id}/reject`} method="POST"><Button size="icon" variant="ghost" className="h-7 w-7 text-red-400"><XCircle className="w-4 h-4" /></Button></form>
-                  </div>
-                )}
+                {c.status === 0 && <AdminCampaignAction id={c.id} />}
                 <span className="text-xs text-muted-foreground shrink-0">{formatDistanceToNow(new Date(c.createdAt), { addSuffix: true })}</span>
               </CardContent>
             </Card>

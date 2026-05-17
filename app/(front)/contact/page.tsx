@@ -30,7 +30,7 @@ export default function ContactPage() {
     <div className="py-20 px-4">
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-14">
-          <h1 className="text-4xl md:text-6xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 font-display">
             Get in <span className="gradient-text">touch</span>
           </h1>
           <p className="text-muted-foreground text-lg">Have a question or need help? We&apos;re here for you.</p>
@@ -44,7 +44,7 @@ export default function ContactPage() {
               { icon: MapPin, title: 'Based Online', desc: 'Worldwide', sub: 'Serving 120+ countries' },
             ].map(({ icon: Icon, title, desc, sub }) => (
               <div key={title} className="glass rounded-2xl p-5 border border-border/50">
-                <div className="feature-icon w-10 h-10 mb-3"><Icon className="w-4 h-4 text-white" /></div>
+                <div className="feature-icon w-10 h-10 mb-3"><Icon className="w-4 h-4 text-primary-foreground" /></div>
                 <p className="font-semibold text-sm mb-0.5">{title}</p>
                 <p className="text-sm text-primary">{desc}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
@@ -73,7 +73,7 @@ export default function ContactPage() {
                 <Textarea value={form.message} onChange={update('message')} placeholder="Tell us more..."
                   className="glass border-border/50 resize-none" rows={5} />
               </div>
-              <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold" style={{ background: 'var(--gradient-primary)' }}>
+              <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold gradient-bg-primary text-primary-foreground">
                 {loading ? 'Sending...' : <span className="flex items-center gap-2"><Send className="w-4 h-4" />Send Message</span>}
               </Button>
             </form>

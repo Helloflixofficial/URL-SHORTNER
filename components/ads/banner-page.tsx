@@ -72,10 +72,10 @@ export default function BannerPage({
         <div className="w-full max-w-2xl">
           {/* Brand */}
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--gradient-primary)' }}>
-              <Link2 className="w-3.5 h-3.5 text-white" />
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center gradient-bg-primary">
+              <Link2 className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-            <span className="gradient-text font-bold text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Linksite</span>
+            <span className="gradient-text font-bold text-lg font-display">Linksite</span>
           </div>
 
           <div className="glass rounded-3xl border border-border/50 overflow-hidden">
@@ -110,8 +110,7 @@ export default function BannerPage({
               <Button
                 onClick={doRedirect}
                 disabled={!canRedirect || redirecting}
-                className="px-8 h-12 rounded-xl text-base btn-glow"
-                style={{ background: ready ? 'var(--gradient-primary)' : undefined }}
+                className={`px-8 h-12 rounded-xl text-base btn-glow text-primary-foreground ${ready ? 'gradient-bg-primary' : ''}`}
               >
                 {redirecting ? 'Redirecting...' : ready ? (
                   <span className="flex items-center gap-2">

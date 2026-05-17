@@ -1,31 +1,64 @@
 import { prisma } from '@/lib/prisma'
-import { Card, CardContent } from '@/components/ui/card'
-import { MessageSquare } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Bell, Plus, Trash2, Megaphone } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import AdminAnnouncementForm from '@/components/admin/announcement-form'
 
-export const metadata = { title: 'Admin — Announcements' }
+export const metadata = { title: 'Manage Announcements — Admin' }
 
 export default async function AdminAnnouncementsPage() {
   const announcements = await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } })
+
   return (
     <div className="space-y-6">
-      <div><h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}><span className="gradient-text">Announcements</span></h1>
-        <p className="text-muted-foreground mt-1">Site-wide notices shown to members</p></div>
-      {announcements.length === 0 ? (
-        <Card className="glass border-border/50"><CardContent className="py-12 text-center text-muted-foreground"><MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>No announcements</p></CardContent></Card>
-      ) : (
-        <div className="space-y-3">
-          {announcements.map(a => (
-            <Card key={a.id} className="glass border-border/50">
-              <CardContent className="py-4">
-                <p className="font-bold text-sm mb-1">{a.title}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">{a.content}</p>
-                <p className="text-xs text-muted-foreground mt-2">{formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}</p>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black font-display">
+            Manage <span className="gradient-text">Announcements</span>
+          </h1>
+          <p className="text-muted-foreground mt-1">Broadcast news to your members</p>
         </div>
-      )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="glass border-border/50 lg:col-span-1">
+          <CardHeader><CardTitle className="text-lg">Create New</CardTitle></CardHeader>
+          <CardContent>
+            <AdminAnnouncementForm />
+          </CardContent>
+        </Card>
+
+        <Card className="glass border-border/50 lg:col-span-2">
+          <CardHeader><CardTitle className="text-lg">Recent Announcements</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            {announcements.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Megaphone className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                <p>No announcements yet</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border/30">
+                {announcements.map((a) => (
+                  <div key={a.id} className="p-5 flex items-start gap-4 hover:bg-white/5 transition-colors">
+                    <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
+                      a.type === 'warning' ? 'bg-amber-500/10 text-amber-500' :
+                      a.type === 'success' ? 'bg-emerald-500/10 text-emerald-500' :
+                      'bg-primary/10 text-primary'
+                    }`}>
+                      <Bell className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold">{a.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{a.content}</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">{formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

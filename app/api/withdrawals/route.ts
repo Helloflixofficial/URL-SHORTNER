@@ -21,13 +21,19 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { balance: true } })
   if (!user || user.balance < amount) return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 })
 
-  const minWithdrawal = 5
+  const minWithdrawalRaw = await prisma.option.findUnique({ where: { key: 'min_withdrawal' } })
+  const minWithdrawal = parseFloat(minWithdrawalRaw?.value || '5')
   if (amount < minWithdrawal) return NextResponse.json({ error: `Minimum withdrawal is $${minWithdrawal}` }, { status: 400 })
 
   const pending = await prisma.withdrawal.count({ where: { userId, status: 0 } })
   if (pending > 0) return NextResponse.json({ error: 'You already have a pending withdrawal request' }, { status: 400 })
 
-  await prisma.withdrawal.create({ data: { userId, amount, method, accountDetails, status: 0 } })
+  // Deduct balance and create withdrawal in a transaction
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { balance: { decrement: amount } } }),
+    prisma.withdrawal.create({ data: { userId, amount, method, accountDetails, status: 0 } })
+  ])
+  
   return NextResponse.json({ ok: true })
 }
 

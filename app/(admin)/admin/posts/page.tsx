@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent } from '@/components/ui/card'
-import { BookOpen, Calendar } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { BookOpen, Calendar, Plus } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 export const metadata = { title: 'Admin — Blog Posts' }
@@ -8,9 +10,19 @@ export const metadata = { title: 'Admin — Blog Posts' }
 export default async function AdminPostsPage() {
   const posts = await prisma.post.findMany({ orderBy: { createdAt: 'desc' } })
   return (
-    <div className="space-y-6">
-      <div><h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}><span className="gradient-text">Blog Posts</span></h1>
-        <p className="text-muted-foreground mt-1">{posts.length} posts</p></div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black font-display">
+            <span className="gradient-text">Blog Posts</span>
+          </h1>
+          <p className="text-muted-foreground mt-1">{posts.length} posts</p>
+        </div>
+        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
+          <Link href="/admin/posts/new">
+            <Plus className="w-4 h-4 mr-2" /> Add Post
+          </Link>
+        </Button>
+      </div>
       {posts.length === 0 ? (
         <Card className="glass border-border/50"><CardContent className="py-12 text-center text-muted-foreground"><BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>No posts yet</p></CardContent></Card>
       ) : (

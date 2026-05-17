@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -9,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Eye, EyeOff, UserPlus, Mail, Lock, User } from 'lucide-react'
+import { Eye, EyeOff, UserPlus, Mail, Lock, User, Gift } from 'lucide-react'
 
 const schema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters').max(20).regex(/^[a-zA-Z0-9_]+$/, 'Letters, numbers, underscore only'),
@@ -24,8 +25,19 @@ type FormData = z.infer<typeof schema>
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  
+  // Try to get referral ID from query param or cookie
+  const [referralId, setReferralId] = useState<string | null>(searchParams.get('ref'))
+  
+  useEffect(() => {
+    if (!referralId) {
+      const match = document.cookie.match(/ref_id=([^;]+)/)
+      if (match) setReferralId(match[1])
+    }
+  }, [referralId])
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -37,7 +49,12 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: data.username, email: data.email, password: data.password }),
+        body: JSON.stringify({ 
+          username: data.username, 
+          email: data.email, 
+          password: data.password,
+          referralId: referralId
+        }),
       })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || 'Registration failed')
@@ -53,10 +70,17 @@ export default function RegisterPage() {
   return (
     <div className="glass rounded-3xl p-8 border border-border/50">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black mb-2 font-display">
           Create account
         </h1>
         <p className="text-muted-foreground text-sm">Start earning money from your links today</p>
+        
+        {referralId && (
+          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+            <Gift className="w-3 h-3" />
+            Special Offer: You are being referred!
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -102,8 +126,7 @@ export default function RegisterPage() {
           {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
         </div>
 
-        <Button type="submit" disabled={loading} className="w-full h-11 rounded-xl btn-glow font-semibold mt-2"
-          style={{ background: 'var(--gradient-primary)' }}>
+        <Button type="submit" disabled={loading} className="w-full h-11 rounded-xl btn-glow font-semibold mt-2 gradient-bg-primary text-primary-foreground">
           {loading ? (
             <span className="flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

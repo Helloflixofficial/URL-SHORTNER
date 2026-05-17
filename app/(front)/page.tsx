@@ -49,7 +49,7 @@ export default function HomePage() {
             <span>Trusted by <strong className="text-foreground">50,000+</strong> publishers worldwide</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight font-display">
             Shorten Links &{' '}
             <span className="gradient-text">Earn Money</span>
           </h1>
@@ -70,10 +70,8 @@ export default function HomePage() {
         <LiveBackground />
 
         {/* Floating orbs */}
-        <div className="absolute top-1/4 left-10 w-64 h-64 rounded-full opacity-10 blur-3xl float-anim"
-          style={{ background: 'var(--gradient-primary)' }} />
-        <div className="absolute bottom-1/4 right-10 w-48 h-48 rounded-full opacity-10 blur-3xl float-anim"
-          style={{ background: 'var(--gradient-primary)', animationDelay: '2s' }} />
+        <div className="absolute top-1/4 left-10 w-64 h-64 rounded-full opacity-10 blur-3xl float-anim gradient-bg-primary text-primary-foreground" />
+        <div className="absolute bottom-1/4 right-10 w-48 h-48 rounded-full opacity-10 blur-3xl float-anim orb-primary" style={{ animationDelay: '2s' }} />
       </section>
 
       {/* ─── Stats ─── */}
@@ -82,7 +80,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s) => (
               <div key={s.label} className="stat-card rounded-2xl p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black gradient-text mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <div className="text-3xl md:text-4xl font-black gradient-text mb-1 font-display">
                   {s.value}
                 </div>
                 <div className="text-sm text-muted-foreground font-medium">{s.label}</div>
@@ -96,7 +94,7 @@ export default function HomePage() {
       <section className="py-24 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-3xl md:text-5xl font-black mb-4 font-display">
               Everything you need to{' '}
               <span className="gradient-text">succeed</span>
             </h2>
@@ -110,7 +108,7 @@ export default function HomePage() {
               <div key={f.title}
                 className="glass rounded-2xl p-6 border border-border/50 hover:border-primary/30 transition-all duration-300 group">
                 <div className="feature-icon w-12 h-12 mb-4 group-hover:scale-110 transition-transform">
-                  <f.icon className="w-5 h-5 text-white" />
+                  <f.icon className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
@@ -124,7 +122,7 @@ export default function HomePage() {
       <section className="py-24 px-4 bg-card/30">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-3xl md:text-5xl font-black mb-4 font-display">
               Start earning in <span className="gradient-text">3 steps</span>
             </h2>
           </div>
@@ -139,7 +137,7 @@ export default function HomePage() {
                   <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t border-dashed border-border/50" />
                 )}
                 <div className="w-16 h-16 rounded-2xl glass border border-primary/30 flex items-center justify-center mx-auto mb-4">
-                  <span className="gradient-text font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  <span className="gradient-text font-black text-xl font-display">
                     {item.step}
                   </span>
                 </div>
@@ -155,7 +153,7 @@ export default function HomePage() {
       <section className="py-24 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-3xl md:text-5xl font-black mb-4 font-display">
               Loved by <span className="gradient-text">creators</span>
             </h2>
           </div>
@@ -181,16 +179,14 @@ export default function HomePage() {
       {/* ─── CTA ─── */}
       <section className="py-24 px-4">
         <div className="container mx-auto max-w-3xl">
-          <div className="glass rounded-3xl p-12 text-center border border-primary/20"
-            style={{ background: 'var(--gradient-card)' }}>
-            <h2 className="text-3xl md:text-5xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div className="glass rounded-3xl p-12 text-center border border-primary/20 gradient-bg-card">
+            <h2 className="text-3xl md:text-5xl font-black mb-4 font-display">
               Ready to start <span className="gradient-text">earning?</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-lg">
               Join 50,000+ publishers already making money with Linksite.
             </p>
-            <Button asChild size="lg" className="btn-glow text-base px-8 h-14 rounded-xl"
-              style={{ background: 'var(--gradient-primary)' }}>
+            <Button asChild size="lg" className="btn-glow text-base px-8 h-14 rounded-xl gradient-bg-primary text-primary-foreground">
               <a href="/register">
                 Get Started Free <ArrowRight className="w-4 h-4 ml-2" />
               </a>

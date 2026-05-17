@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/react'
 import {
   LayoutDashboard, Users, Link2, Megaphone, ArrowDownToLine,
   CreditCard, FileText, BookOpen, MessageSquare, Star,
-  Settings, LogOut, ChevronRight, Shield,
+  Settings, LogOut, ChevronRight, Shield, TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -19,10 +19,13 @@ const navItems = [
   { href: '/admin/links', icon: Link2, label: 'Links' },
   { href: '/admin/campaigns', icon: Megaphone, label: 'Campaigns' },
   { href: '/admin/withdrawals', icon: ArrowDownToLine, label: 'Withdrawals' },
+  { href: '/admin/payout-rates', icon: TrendingUp, label: 'Payout Rates' },
+  { href: '/admin/invoices', icon: FileText, label: 'Deposits' },
   { href: '/admin/plans', icon: CreditCard, label: 'Plans' },
+  { href: '/admin/tickets', icon: MessageSquare, label: 'Support Tickets' },
   { href: '/admin/posts', icon: BookOpen, label: 'Blog Posts' },
   { href: '/admin/pages', icon: FileText, label: 'Pages' },
-  { href: '/admin/announcements', icon: MessageSquare, label: 'Announcements' },
+  { href: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
   { href: '/admin/testimonials', icon: Star, label: 'Testimonials' },
   { href: '/admin/settings', icon: Settings, label: 'Settings' },
 ]
@@ -38,10 +41,10 @@ export default function AdminSidebar({ user }: Props) {
     <>
       <div className="p-4 border-b border-border/30">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--gradient-primary)' }}>
-            <Shield className="w-3.5 h-3.5 text-white" />
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center gradient-bg-primary">
+            <Shield className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
-          <span className="gradient-text font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Admin</span>
+          <span className="gradient-text font-black text-lg font-display">Admin</span>
         </Link>
       </div>
 
@@ -51,8 +54,8 @@ export default function AdminSidebar({ user }: Props) {
           return (
             <Link key={item.href} href={item.href}
               className={cn(
-                'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all',
-                active ? 'sidebar-item-active text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-white/5',
+                'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+                active ? 'sidebar-item-active text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
               )}>
               <item.icon className="w-4 h-4 shrink-0" />
               <span className="flex-1">{item.label}</span>
@@ -66,7 +69,7 @@ export default function AdminSidebar({ user }: Props) {
         <div className="flex items-center gap-2 mb-2">
           <Avatar className="w-8 h-8">
             <AvatarImage src={user.image ?? ''} />
-            <AvatarFallback style={{ background: 'var(--gradient-primary)' }} className="text-white text-xs font-bold">
+            <AvatarFallback className="bg-primary/20 text-primary font-semibold uppercase text-xs">
               {user.name?.[0]?.toUpperCase() ?? 'A'}
             </AvatarFallback>
           </Avatar>
@@ -86,20 +89,20 @@ export default function AdminSidebar({ user }: Props) {
   return (
     <>
       {/* Mobile Nav Header */}
-      <div className="md:hidden flex items-center justify-between p-4 glass border-b border-border/50 sticky top-0 z-40">
+      <div className="md:hidden flex items-center justify-between p-4 bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--gradient-primary)' }}>
-            <Shield className="w-3.5 h-3.5 text-white" />
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center gradient-bg-primary">
+            <Shield className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
-          <span className="gradient-text font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Admin</span>
+          <span className="gradient-text font-black text-lg font-display">Admin</span>
         </Link>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon-sm">
+            <Button variant="ghost" size="icon-sm" aria-label="Open admin sidebar">
               <Menu className="w-5 h-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 flex flex-col glass border-r border-border/50">
+          <SheetContent side="left" className="w-64 p-0 flex flex-col bg-card border-r border-border/50">
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <SidebarContent />
           </SheetContent>
@@ -107,7 +110,7 @@ export default function AdminSidebar({ user }: Props) {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-60 min-h-screen glass border-r border-border/50 flex-col sticky top-0">
+      <aside className="hidden md:flex w-60 min-h-screen bg-card border-r border-border/50 flex-col sticky top-0">
         <SidebarContent />
       </aside>
     </>

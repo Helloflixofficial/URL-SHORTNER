@@ -16,7 +16,7 @@ export default async function BlogPage() {
     <div className="py-20 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-14">
-          <h1 className="text-4xl md:text-6xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 font-display">
             Latest from our <span className="gradient-text">Blog</span>
           </h1>
           <p className="text-muted-foreground text-lg">Tips, news, and guides to maximize your earnings</p>

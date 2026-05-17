@@ -14,7 +14,7 @@ export default async function AdminLinksPage({ searchParams }: { searchParams: P
   ])
   return (
     <div className="space-y-6">
-      <div><h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}><span className="gradient-text">All Links</span></h1>
+      <div><h1 className="text-3xl font-black font-display"><span className="gradient-text">All Links</span></h1>
         <p className="text-muted-foreground mt-1">{total} active links</p></div>
       <AdminLinksTable links={links} total={total} page={page} pageSize={pageSize} searchQuery={q ?? ''} />
     </div>

@@ -8,7 +8,7 @@ export default async function AdminTestimonialsPage() {
   const testimonials = await prisma.testimonial.findMany({ orderBy: { createdAt: 'desc' } })
   return (
     <div className="space-y-6">
-      <div><h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}><span className="gradient-text">Testimonials</span></h1>
+      <div><h1 className="text-3xl font-black font-display"><span className="gradient-text">Testimonials</span></h1>
         <p className="text-muted-foreground mt-1">Manage user testimonials on the landing page</p></div>
       {testimonials.length === 0 ? (
         <Card className="glass border-border/50"><CardContent className="py-12 text-center text-muted-foreground"><Star className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>No testimonials</p></CardContent></Card>

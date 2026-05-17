@@ -50,7 +50,7 @@ export default function LoginPage() {
   return (
     <div className="glass rounded-3xl p-8 border border-border/50">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black mb-2 font-display">
           Welcome back
         </h1>
         <p className="text-muted-foreground text-sm">Sign in to your Linksite account</p>
@@ -99,8 +99,7 @@ export default function LoginPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-xl btn-glow font-semibold"
-          style={{ background: 'var(--gradient-primary)' }}
+          className="w-full h-11 rounded-xl btn-glow font-semibold gradient-bg-primary text-primary-foreground"
         >
           {loading ? (
             <span className="flex items-center gap-2">

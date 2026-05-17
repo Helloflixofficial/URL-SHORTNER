@@ -2,8 +2,9 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CreditCard, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { CreditCard, CheckCircle, XCircle, Clock, Plus } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import Link from 'next/link'
 
 export const metadata = { title: 'Invoices' }
 
@@ -18,10 +19,15 @@ export default async function InvoicesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black font-display">
           <span className="gradient-text">Invoices</span>
         </h1>
         <p className="text-muted-foreground mt-1">Your billing history</p>
+      </div>
+      <div className="flex justify-end">
+        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
+          <Link href="/invoices/add"><Plus className="w-4 h-4 mr-2" />Add Funds</Link>
+        </Button>
       </div>
       <Card className="glass border-border/50">
         <CardHeader><CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5 text-primary" />Invoice History</CardTitle></CardHeader>

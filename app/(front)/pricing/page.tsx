@@ -16,7 +16,7 @@ export default async function PricingPage() {
     <div className="py-20 px-4">
       <div className="container mx-auto max-w-5xl">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 font-display">
             Simple, transparent <span className="gradient-text">pricing</span>
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
@@ -39,9 +39,9 @@ export default async function PricingPage() {
                   </div>
                 )}
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 feature-icon">
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <h2 className="text-2xl font-black mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{plan.name}</h2>
+                <h2 className="text-2xl font-black mb-1 font-display">{plan.name}</h2>
                 <div className="mb-6">
                   {plan.price === 0 ? (
                     <span className="text-4xl font-black gradient-text">Free</span>
@@ -55,8 +55,7 @@ export default async function PricingPage() {
                 <ul className="space-y-3 mb-8">
                   {features.map((f, fi) => (
                     <li key={fi} className="flex items-center gap-2.5 text-sm">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: 'rgba(124,58,237,0.2)' }}>
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-primary/20">
                         <Check className="w-3 h-3 text-primary" />
                       </div>
                       {f}

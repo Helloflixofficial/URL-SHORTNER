@@ -53,18 +53,18 @@ export default function ShortenForm() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Paste your long URL here..."
-          className="flex-1 h-14 text-base glass border-border/50 bg-white/5 focus:border-primary/50 rounded-xl px-5"
+          aria-label="URL to shorten"
+          className="flex-1 h-14 text-base bg-muted border-border/50 placeholder:text-muted-foreground focus:border-primary/50 focus:ring-2 focus:ring-ring rounded-xl px-5"
           required
         />
         <Button
           type="submit"
           disabled={loading}
-          className="h-14 px-8 rounded-xl btn-glow font-semibold text-base whitespace-nowrap"
-          style={{ background: 'var(--gradient-primary)' }}
+          className="h-14 px-8 rounded-xl btn-glow font-semibold text-base whitespace-nowrap gradient-bg-primary text-primary-foreground"
         >
           {loading ? (
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
               Shortening...
             </span>
           ) : (
@@ -79,7 +79,7 @@ export default function ShortenForm() {
         <div className="mt-4 glass border border-primary/30 rounded-xl p-4 flex items-center gap-3 animate-in slide-in-from-bottom-2">
           <Link2 className="w-5 h-5 text-primary shrink-0" />
           <span className="flex-1 text-primary font-medium truncate">{result.shortUrl}</span>
-          <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0 gap-1.5">
+          <Button size="sm" variant="outline" onClick={handleCopy} className="shrink-0 gap-1.5" aria-label="Copy short URL">
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? 'Copied!' : 'Copy'}
           </Button>

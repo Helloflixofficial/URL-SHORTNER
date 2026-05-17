@@ -18,10 +18,10 @@ export default function AdminWithdrawalsTable({ withdrawals, total, page, pageSi
   const totalPages = Math.ceil(total / pageSize)
 
   const updateStatus = async (id: string, status: number) => {
-    const res = await fetch(`/api/admin/withdrawals/${id}`, {
-      method: 'PATCH',
+    const res = await fetch('/api/admin/withdrawals', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ id, status }),
     })
     if (res.ok) { toast.success(status === 1 ? 'Withdrawal approved' : 'Withdrawal rejected'); router.refresh() }
     else toast.error('Failed to update')

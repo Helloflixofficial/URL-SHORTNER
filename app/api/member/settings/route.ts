@@ -7,7 +7,12 @@ export async function PATCH(req: NextRequest) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const userId = session.user.id!
-  const { username, email, disableEarnings } = await req.json()
+  const { 
+    username, email, disableEarnings,
+    firstName, lastName, address1, address2,
+    city, state, zip, country,
+    withdrawalMethod, withdrawalAccount
+  } = await req.json()
 
   if (username) {
     const exists = await prisma.user.findFirst({ where: { username, id: { not: userId } } })
@@ -20,7 +25,14 @@ export async function PATCH(req: NextRequest) {
 
   const updated = await prisma.user.update({
     where: { id: userId },
-    data: { ...(username ? { username } : {}), ...(email ? { email } : {}), ...(disableEarnings !== undefined ? { disableEarnings } : {}) },
+    data: { 
+      ...(username ? { username } : {}), 
+      ...(email ? { email } : {}), 
+      ...(disableEarnings !== undefined ? { disableEarnings } : {}),
+      firstName, lastName, address1, address2,
+      city, state, zip, country,
+      withdrawalMethod, withdrawalAccount
+    },
   })
   return NextResponse.json({ ok: true })
 }

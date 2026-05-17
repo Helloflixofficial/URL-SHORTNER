@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     if (existingUsername) return NextResponse.json({ error: 'Username already taken' }, { status: 400 })
 
     const hashed = await bcrypt.hash(password, 12)
+    const { referralId } = body // Optional from client
 
     // Get default plan
     const defaultPlan = await prisma.plan.findFirst({ where: { isDefault: true } })
@@ -36,11 +37,20 @@ export async function POST(req: NextRequest) {
         password: hashed,
         role: 'member',
         status: 'active',
+        referralId: referralId || null,
         ...(defaultPlan ? {
           userPlan: { create: { planId: defaultPlan.id } }
         } : {}),
       },
     })
+
+    // Increment referrer count
+    if (referralId) {
+      await prisma.user.update({
+        where: { id: referralId },
+        data: { referredCount: { increment: 1 } }
+      }).catch(() => {}) // Ignore if referrer not found
+    }
 
     return NextResponse.json({ id: user.id, username: user.username, email: user.email })
   } catch (err) {

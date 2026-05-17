@@ -36,7 +36,7 @@ export default function NewCampaignPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black font-display">
           New <span className="gradient-text">Campaign</span>
         </h1>
         <p className="text-muted-foreground mt-1">Advertise across the Linksite publisher network</p>
@@ -73,7 +73,7 @@ export default function NewCampaignPage() {
             </div>
             <div className="space-y-1.5"><Label>Total Budget (USD) *</Label>
               <Input type="number" min="1" step="0.01" value={form.budget} onChange={e => set('budget', e.target.value)} placeholder="100.00" className="h-11 glass border-border/50" /></div>
-            <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold" style={{ background: 'var(--gradient-primary)' }}>
+            <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold gradient-bg-primary text-primary-foreground">
               {loading ? 'Submitting...' : 'Submit Campaign for Review'}
             </Button>
           </form>

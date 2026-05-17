@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Search, MoreHorizontal, ChevronLeft, ChevronRight, Shield, Ban, CheckCircle } from 'lucide-react'
+import { Search, MoreHorizontal, ChevronLeft, ChevronRight, Shield, Ban, CheckCircle, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -87,6 +87,24 @@ export default function AdminUsersTable({ users, total, page, pageSize, searchQu
                       <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="w-4 h-4" /></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="glass border-border">
+                      <DropdownMenuItem onClick={() => {
+                        const amount = prompt('Enter new balance:', u.balance.toString())
+                        if (amount !== null) {
+                          const val = parseFloat(amount)
+                          if (!isNaN(val)) {
+                            fetch(`/api/admin/users/${u.id}`, { 
+                              method: 'PATCH', 
+                              headers: { 'Content-Type': 'application/json' }, 
+                              body: JSON.stringify({ balance: val }) 
+                            }).then(res => {
+                              if (res.ok) { toast.success('Balance updated'); router.refresh() }
+                              else toast.error('Failed')
+                            })
+                          }
+                        }
+                      }}>
+                        <DollarSign className="w-3.5 h-3.5 mr-2 text-primary" />Edit Balance
+                      </DropdownMenuItem>
                       {u.status !== 'active' && (
                         <DropdownMenuItem onClick={() => updateStatus(u.id, 'active')}>
                           <CheckCircle className="w-3.5 h-3.5 mr-2 text-emerald-400" />Activate

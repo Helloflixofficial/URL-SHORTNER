@@ -3,6 +3,8 @@ import { Link2, ExternalLink, Globe, Play, Camera } from 'lucide-react'
 
 const footerLinks = {
   Product: [
+    { href: '/payout-rates', label: 'Payout Rates' },
+    { href: '/payouts', label: 'Payment Proofs' },
     { href: '/pricing', label: 'Pricing' },
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
@@ -27,10 +29,10 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--gradient-primary)' }}>
-                <Link2 className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center gradient-bg-primary">
+                <Link2 className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="gradient-text font-bold text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              <span className="gradient-text font-bold text-xl font-display">
                 Linksite
               </span>
             </Link>
@@ -39,13 +41,13 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3">
               {[
-                { Icon: ExternalLink, href: '#' },
-                { Icon: Globe, href: '#' },
-                { Icon: Play, href: '#' },
-                { Icon: Camera, href: '#' },
-              ].map(({ Icon, href }, i) => (
-                <a key={i} href={href}
-                  className="w-8 h-8 rounded-lg glass border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all">
+                { Icon: ExternalLink, href: '#', label: 'Website' },
+                { Icon: Globe, href: '#', label: 'Globe' },
+                { Icon: Play, href: '#', label: 'YouTube' },
+                { Icon: Camera, href: '#', label: 'Instagram' },
+              ].map(({ Icon, href, label }, i) => (
+                <a key={i} href={href} aria-label={label}
+                  className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors duration-150">
                   <Icon className="w-3.5 h-3.5" />
                 </a>
               ))}
@@ -60,7 +62,7 @@ export default function Footer() {
                 {links.map((l) => (
                   <li key={l.href}>
                     <Link href={l.href}
-                      className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                      className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-150">
                       {l.label}
                     </Link>
                   </li>

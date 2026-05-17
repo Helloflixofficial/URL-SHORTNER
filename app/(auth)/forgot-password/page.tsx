@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
           <Mail className="w-8 h-8 text-emerald-500" />
         </div>
-        <h1 className="text-2xl font-black mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-2xl font-black mb-3 font-display">
           Check your email
         </h1>
         <p className="text-muted-foreground text-sm mb-6">
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="glass rounded-3xl p-8 border border-border/50">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black mb-2 font-display">
           Reset Password
         </h1>
         <p className="text-muted-foreground text-sm">Enter your email to receive a reset link</p>
@@ -89,8 +89,7 @@ export default function ForgotPasswordPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-xl btn-glow font-semibold"
-          style={{ background: 'var(--gradient-primary)' }}
+          className="w-full h-11 rounded-xl btn-glow font-semibold gradient-bg-primary text-primary-foreground"
         >
           {loading ? (
             <span className="flex items-center gap-2">

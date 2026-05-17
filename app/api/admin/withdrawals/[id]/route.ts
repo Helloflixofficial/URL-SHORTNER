@@ -8,25 +8,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!session?.user || (session.user as { role?: string }).role !== 'admin')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
-  const { status } = await req.json()
-  const withdrawal = await prisma.withdrawal.findUnique({ where: { id: id } })
+  const { status, note } = await req.json()
+  
+  const withdrawal = await prisma.withdrawal.findUnique({ where: { id } })
   if (!withdrawal) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (withdrawal.status !== 0) return NextResponse.json({ error: 'Withdrawal already processed' }, { status: 400 })
 
-  // If approving, process PayPal payout if applicable
-  if (status === 1 && withdrawal.status === 0) {
+  if (status === 1) {
+    // Approve
     if (withdrawal.method === 'paypal' && process.env.PAYPAL_CLIENT_ID) {
       const payoutRes = await sendPayout(withdrawal.accountDetails, withdrawal.amount, withdrawal.id)
-      if (!payoutRes.success) {
-        return NextResponse.json({ error: 'PayPal payout failed. Check server logs.' }, { status: 500 })
-      }
+      if (!payoutRes.success) return NextResponse.json({ error: 'PayPal payout failed' }, { status: 500 })
     }
-
+    await prisma.withdrawal.update({ where: { id }, data: { status: 1, note } })
+  } else if (status === 2) {
+    // Reject & Refund
     await prisma.$transaction([
-      prisma.withdrawal.update({ where: { id: id }, data: { status: 1 } }),
-      prisma.user.update({ where: { id: withdrawal.userId }, data: { balance: { decrement: withdrawal.amount } } }),
+      prisma.withdrawal.update({ where: { id }, data: { status: 2, note } }),
+      prisma.user.update({ where: { id: withdrawal.userId }, data: { balance: { increment: withdrawal.amount } } })
     ])
-  } else {
-    await prisma.withdrawal.update({ where: { id: id }, data: { status } })
   }
+
   return NextResponse.json({ ok: true })
 }

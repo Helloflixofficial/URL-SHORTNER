@@ -10,19 +10,27 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { ArrowDownToLine } from 'lucide-react'
 
-interface Props { balance: number; minWithdrawal: number }
+interface Props { 
+  balance: number; 
+  methods: any[];
+  initialMethod?: string;
+  initialAccount?: string;
+}
 
-export default function WithdrawalForm({ balance, minWithdrawal }: Props) {
+export default function WithdrawalForm({ balance, methods, initialMethod, initialAccount }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState('')
-  const [method, setMethod] = useState('paypal')
-  const [accountDetails, setAccountDetails] = useState('')
+  const [method, setMethod] = useState(initialMethod || methods[0]?.key || 'paypal')
+  const [accountDetails, setAccountDetails] = useState(initialAccount || '')
+
+  const selectedMethod = methods.find(m => m.key === method)
+  const minWithdrawal = selectedMethod?.minAmount || 5
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const amt = parseFloat(amount)
-    if (isNaN(amt) || amt < minWithdrawal) { toast.error(`Minimum withdrawal is $${minWithdrawal}`); return }
+    if (isNaN(amt) || amt < minWithdrawal) { toast.error(`Minimum withdrawal for ${selectedMethod?.name || 'this method'} is $${minWithdrawal}`); return }
     if (amt > balance) { toast.error('Insufficient balance'); return }
     if (!accountDetails.trim()) { toast.error('Please enter account details'); return }
     setLoading(true)
@@ -35,7 +43,7 @@ export default function WithdrawalForm({ balance, minWithdrawal }: Props) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       toast.success('Withdrawal request submitted!')
-      setAmount(''); setAccountDetails('')
+      setAmount(''); 
       router.refresh()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Failed to submit')
@@ -60,28 +68,31 @@ export default function WithdrawalForm({ balance, minWithdrawal }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Payment Method</Label>
-              <Select value={method} onValueChange={(v) => setMethod(v || 'paypal')}>
+              <Select value={method} onValueChange={(v) => setMethod(v)}>
                 <SelectTrigger className="h-11 glass border-border/50"><SelectValue /></SelectTrigger>
                 <SelectContent className="glass border-border">
-                  <SelectItem value="paypal">PayPal</SelectItem>
-                  <SelectItem value="bank">Bank Transfer</SelectItem>
-                  <SelectItem value="crypto">Cryptocurrency</SelectItem>
+                  {methods.map(m => (
+                    <SelectItem key={m.id} value={m.key}>{m.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          
           <div className="space-y-1.5">
-            <Label>Account Details</Label>
+            <Label>{selectedMethod?.inputLabel || 'Account Details'}</Label>
             <Textarea value={accountDetails} onChange={e => setAccountDetails(e.target.value)}
-              placeholder={method === 'paypal' ? 'Your PayPal email address' : method === 'bank' ? 'Bank name, account number, routing number' : 'Wallet address and network'}
+              placeholder="Enter your payout account details..."
               className="glass border-border/50 resize-none" rows={3} />
           </div>
+
           <Button type="submit" disabled={loading || balance < minWithdrawal}
-            className="btn-glow font-semibold" style={{ background: 'var(--gradient-primary)' }}>
+            className="w-full btn-glow font-semibold gradient-bg-primary text-primary-foreground h-11">
             {loading ? 'Submitting...' : 'Request Withdrawal'}
           </Button>
+          
           {balance < minWithdrawal && (
-            <p className="text-xs text-muted-foreground">Minimum balance of ${minWithdrawal} required</p>
+            <p className="text-xs text-muted-foreground text-center">Minimum balance of ${minWithdrawal} required for this method</p>
           )}
         </form>
       </CardContent>

@@ -70,7 +70,7 @@ export default function NewLinkPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-black" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h1 className="text-3xl font-black font-display">
           Create <span className="gradient-text">New Link</span>
         </h1>
         <p className="text-muted-foreground mt-1">Shorten a URL and earn from every click</p>
@@ -112,7 +112,7 @@ export default function NewLinkPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold" style={{ background: 'var(--gradient-primary)' }}>
+            <Button type="submit" disabled={loading} className="w-full h-11 btn-glow font-semibold gradient-bg-primary text-primary-foreground">
               {loading ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating...</span>
                 : <span className="flex items-center gap-2"><Zap className="w-4 h-4" />Create Link</span>}
             </Button>

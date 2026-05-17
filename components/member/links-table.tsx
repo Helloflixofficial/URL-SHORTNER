@@ -99,8 +99,7 @@ export default function LinksTable({ links, total, page, pageSize, baseUrl, sear
                 <TableRow key={link.id} className="border-border/30 table-row-hover">
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.2)' }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-primary/15 border border-primary/20">
                         <Link2 className="w-3.5 h-3.5 text-primary" />
                       </div>
                       <div>
