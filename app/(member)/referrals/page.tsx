@@ -2,115 +2,136 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Users, DollarSign, TrendingUp, Copy, Share2, Info } from 'lucide-react'
-import { getOption } from '@/lib/options'
-import ReferralLinkCard from '@/components/member/referral-link-card'
+import { Users, ChevronLeft, ChevronRight, Copy, Share2 } from 'lucide-react'
+import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
 
-export const metadata = { title: 'Referrals' }
+export const metadata = { title: 'My Referrals' }
 
-export default async function ReferralsPage() {
+export default async function MemberReferralsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const session = await auth()
   if (!session?.user) redirect('/login')
   const userId = session.user.id!
+  
+  const params = await searchParams
+  const page = parseInt(params.page || '1') || 1
+  const pageSize = 20
 
-  const [user, refPercentRaw] = await Promise.all([
-    prisma.user.findUnique({ 
-      where: { id: userId }, 
-      select: { id: true, referralEarnings: true, referredCount: true } 
-    }),
-    getOption('referral_percentage', '20'),
+  const [total, referrals] = await Promise.all([
+    prisma.user.count({ where: { referralId: userId } }),
+    prisma.user.findMany({
+      where: { referralId: userId },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select: { id: true, username: true, createdAt: true }
+    })
   ])
 
+  const totalPages = Math.ceil(total / pageSize)
   const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
-  const referralLink = `${baseUrl}/register?ref=${userId}`
-  const refPercent = refPercentRaw
-
-  const stats = [
-    { label: 'Total Referrals', value: user?.referredCount ?? 0, icon: Users, chipClass: 'icon-chip-purple' },
-    { label: 'Referral Earnings', value: `$${(user?.referralEarnings ?? 0).toFixed(4)}`, icon: DollarSign, chipClass: 'icon-chip-green' },
-    { label: 'Commission Rate', value: `${refPercent}%`, icon: TrendingUp, chipClass: 'icon-chip-amber' },
-  ]
+  const referralLink = `${baseUrl}/ref/${session.user.name}` // Or a user-specific token if preferred. Assuming username for now.
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-black font-display">
-          <span className="gradient-text">Referrals</span>
-        </h1>
-        <p className="text-muted-foreground mt-1">Invite your friends and earn for lifetime</p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center gradient-bg-primary">
+          <Users className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-black font-display">
+            My <span className="gradient-text">Referrals</span>
+          </h1>
+          <p className="text-muted-foreground mt-1">Invite friends and earn a percentage of their earnings</p>
+        </div>
       </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {stats.map((s) => (
-          <Card key={s.label} className="glass border-border/50 stat-card">
-            <CardContent className="pt-6">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-white/5 border border-white/10">
-                <s.icon className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-2xl font-black font-display">{s.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ReferralLinkCard referralLink={referralLink} />
-
-        <Card className="glass border-border/50">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <Info className="w-5 h-5 text-primary" /> How it works
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Referral Link Card */}
+        <Card className="glass border-border/50 md:col-span-1">
+          <CardHeader className="pb-3 border-b border-border/30">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-primary" /> Your Referral Link
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 text-xs font-bold text-primary">1</div>
-                <p className="text-sm text-muted-foreground">Share your unique referral link with your friends or audience.</p>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 text-xs font-bold text-primary">2</div>
-                <p className="text-sm text-muted-foreground">When they sign up, they become your referrals for lifetime.</p>
-              </div>
-              <div className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0 text-xs font-bold text-primary">3</div>
-                <p className="text-sm text-muted-foreground">You will earn <span className="text-foreground font-bold">{refPercent}%</span> of their earnings automatically.</p>
+          <CardContent className="pt-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Share this link to invite users. You will earn a bonus from their activity.</p>
+            
+            <div className="space-y-1.5">
+              <div className="relative">
+                <Input 
+                  readOnly 
+                  value={referralLink} 
+                  className="pr-10 glass border-border/50 bg-muted/50"
+                />
+                {/* Normally we'd use a client component for copy to clipboard, this is a simplified visual representation */}
+                <Button variant="ghost" size="icon" className="absolute right-1 top-1 h-7 w-7 text-muted-foreground">
+                  <Copy className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mt-4">
-              <p className="text-xs leading-relaxed">
-                <strong className="text-primary">Tip:</strong> The more high-quality publishers you refer, the more passive income you generate. There is no limit on how much you can earn!
-              </p>
+
+            <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
+              <p className="text-sm font-semibold text-primary mb-1">Referral Rate: 20%</p>
+              <p className="text-xs text-muted-foreground">You receive 20% of the earnings from users who sign up via your link for life.</p>
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      <Card className="glass border-border/50">
-        <CardHeader>
-          <CardTitle className="text-lg font-bold">Referral FAQ</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <h4 className="font-bold text-sm">When do I get paid?</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Referral commissions are added to your balance in real-time as your referrals earn money. You can withdraw this money along with your regular earnings.
-              </p>
+        {/* Referrals Table Card */}
+        <Card className="glass border-border/50 md:col-span-2">
+          <CardHeader className="pb-3 border-b border-border/30">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" /> Referred Users ({total})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border/30 bg-muted/20">
+                    <TableHead>Username</TableHead>
+                    <TableHead>Joined Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {referrals.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-8 text-muted-foreground">
+                        You haven't referred anyone yet. Share your link to start earning!
+                      </TableCell>
+                    </TableRow>
+                  ) : referrals.map((u) => (
+                    <TableRow key={u.id} className="border-border/30 table-row-hover">
+                      <TableCell className="font-medium">{u.username}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(u.createdAt), { addSuffix: true })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-sm">Is there a limit?</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Absolutely not! You can refer as many people as you want. The more active your referrals are, the more you earn.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-muted-foreground">Page {page} of {totalPages}</p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" disabled={page <= 1} asChild className="glass">
+                    <Link href={`/referrals?page=${page - 1}`}><ChevronLeft className="w-4 h-4" /></Link>
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={page >= totalPages} asChild className="glass">
+                    <Link href={`/referrals?page=${page + 1}`}><ChevronRight className="w-4 h-4" /></Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

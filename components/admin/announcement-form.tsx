@@ -53,7 +53,7 @@ export default function AdminAnnouncementForm() {
 
       <div className="space-y-1.5">
         <Label>Type</Label>
-        <Select value={type} onValueChange={setType}>
+        <Select value={type} onValueChange={v => setType(v || 'info')}>
           <SelectTrigger className="glass border-border/50">
             <SelectValue />
           </SelectTrigger>

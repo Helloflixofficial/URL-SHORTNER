@@ -1,44 +1,36 @@
 import { prisma } from '@/lib/prisma'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { formatDistanceToNow } from 'date-fns'
-import { Megaphone } from 'lucide-react'
-import AdminCampaignAction from '@/components/admin/campaign-actions'
+import AdminCampaignsTable from '@/components/admin/campaigns-table'
 
 export const metadata = { title: 'Admin — Campaigns' }
 
-const statusLabel = (s: number) => ({ 0: 'Pending', 1: 'Active', 2: 'Paused', 3: 'Completed', 4: 'Rejected' }[s] ?? 'Unknown')
-const statusColor = (s: number) => ({ 0: 'text-amber-400', 1: 'text-emerald-400', 2: 'text-blue-400', 3: 'text-gray-400', 4: 'text-red-400' }[s] ?? '')
-
-export default async function AdminCampaignsPage() {
-  const campaigns = await prisma.campaign.findMany({ orderBy: { createdAt: 'desc' }, take: 50, include: { user: { select: { username: true } } } })
+export default async function AdminCampaignsPage({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; status?: string }> }) {
+  const { page: p, q, status } = await searchParams
+  const page = Math.max(1, parseInt(p ?? '1'))
+  const pageSize = 20
+  
+  const where = { 
+    ...(status !== undefined ? { status: parseInt(status) } : {}),
+    ...(q ? { OR: [{ name: { contains: q } }, { websiteUrl: { contains: q } }] } : {}) 
+  }
+  
+  const [campaigns, total] = await Promise.all([
+    prisma.campaign.findMany({ 
+      where, 
+      orderBy: { createdAt: 'desc' }, 
+      skip: (page - 1) * pageSize, 
+      take: pageSize, 
+      include: { user: { select: { username: true } } } 
+    }),
+    prisma.campaign.count({ where }),
+  ])
+  
   return (
     <div className="space-y-6">
-      <div><h1 className="text-3xl font-black font-display"><span className="gradient-text">Campaigns</span></h1>
-        <p className="text-muted-foreground mt-1">{campaigns.length} campaigns</p></div>
-      {campaigns.length === 0 ? (
-        <Card className="glass border-border/50"><CardContent className="py-12 text-center text-muted-foreground"><Megaphone className="w-10 h-10 mx-auto mb-3 opacity-30" /><p>No campaigns yet</p></CardContent></Card>
-      ) : (
-        <div className="space-y-3">
-          {campaigns.map(c => (
-            <Card key={c.id} className="glass border-border/50">
-              <CardContent className="py-4 flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm">{c.name}</p>
-                  <p className="text-xs text-muted-foreground">by {c.user.username} · {c.websiteUrl}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold">${c.budget.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">spent ${c.spent.toFixed(2)}</p>
-                </div>
-                <span className={`text-xs font-semibold shrink-0 ${statusColor(c.status)}`}>{statusLabel(c.status)}</span>
-                {c.status === 0 && <AdminCampaignAction id={c.id} />}
-                <span className="text-xs text-muted-foreground shrink-0">{formatDistanceToNow(new Date(c.createdAt), { addSuffix: true })}</span>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <div>
+        <h1 className="text-3xl font-black font-display"><span className="gradient-text">Campaigns</span></h1>
+        <p className="text-muted-foreground mt-1">{total} total campaigns</p>
+      </div>
+      <AdminCampaignsTable campaigns={campaigns} total={total} page={page} pageSize={pageSize} searchQuery={q ?? ''} />
     </div>
   )
 }

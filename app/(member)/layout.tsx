@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import DashboardSidebar from '@/components/member/sidebar'
+import MemberShell from '@/components/member/member-shell'
 
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -13,21 +13,16 @@ export default async function MemberLayout({ children }: { children: React.React
   })
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      <DashboardSidebar
-        user={{
-          name: session.user.name,
-          email: session.user.email,
-          image: session.user.image,
-          role: (session.user as { role?: string }).role,
-        }}
-        balance={user?.balance ?? 0}
-      />
-      <main className="flex-1 overflow-auto">
-        <div className="p-6 md:p-8 max-w-7xl mx-auto">
-          {children}
-        </div>
-      </main>
-    </div>
+    <MemberShell
+      user={{
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image,
+        role: (session.user as { role?: string }).role,
+      }}
+      balance={user?.balance ?? 0}
+    >
+      {children}
+    </MemberShell>
   )
 }

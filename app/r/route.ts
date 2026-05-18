@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (!api || !url) return NextResponse.redirect(new URL('/', req.url))
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { apiToken: api },
       select: { id: true }
     })

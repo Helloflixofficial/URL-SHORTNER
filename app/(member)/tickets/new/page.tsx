@@ -60,7 +60,7 @@ export default function NewTicketPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={form.priority} onValueChange={v => setForm({ ...form, priority: v })}>
+              <Select value={form.priority} onValueChange={v => setForm({ ...form, priority: v || '0' })}>
                 <SelectTrigger className="glass h-11 border-border/50"><SelectValue /></SelectTrigger>
                 <SelectContent className="glass border-border">
                   <SelectItem value="0">Low</SelectItem>

@@ -1,77 +1,141 @@
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart3, Eye, Users, TrendingUp } from 'lucide-react'
+import { BarChart3, TrendingUp, Users } from 'lucide-react'
+import AdminCharts from '@/components/admin/admin-charts'
+import MonthSelector from '@/components/shared/month-selector'
 
-export const metadata = { title: 'Admin — Reports' }
+export const metadata = { title: 'Reports' }
 
-export default async function AdminReportsPage() {
+export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
+  const params = await searchParams
+  
+  // Default to current month if no month is provided
   const now = new Date()
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  let targetYear = now.getFullYear()
+  let targetMonth = now.getMonth() + 1 // 1-12
 
-  const [totalViews, paidViews, totalEarnings, topCountries, topLinks] = await Promise.all([
-    prisma.statistic.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.statistic.count({ where: { createdAt: { gte: thirtyDaysAgo }, reason: 1 } }),
-    prisma.statistic.aggregate({ where: { createdAt: { gte: thirtyDaysAgo }, reason: 1 }, _sum: { publisherPrice: true } }),
-    prisma.statistic.groupBy({ by: ['country'], where: { createdAt: { gte: thirtyDaysAgo } }, _count: true, orderBy: { _count: { country: 'desc' } }, take: 10 }),
-    prisma.link.findMany({ where: { status: { not: 3 } }, orderBy: { hits: 'desc' }, take: 10, select: { alias: true, url: true, hits: true }, }),
-  ])
+  if (params.month) {
+    const [y, m] = params.month.split('-')
+    if (y && m) {
+      targetYear = parseInt(y)
+      targetMonth = parseInt(m)
+    }
+  }
+
+  const startDate = new Date(targetYear, targetMonth - 1, 1)
+  const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999)
+
+  const rawDailyStats = await prisma.statistic.findMany({
+    where: {
+      reason: 1,
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    select: { createdAt: true, publisherPrice: true, advertiserPrice: true },
+  })
+
+  // Build chart data
+  const viewMap: Record<string, number> = {}
+  const pubMap: Record<string, number> = {}
+  const ownMap: Record<string, number> = {}
+  const refMap: Record<string, number> = {} // Currently referral earnings are handled separately, but we leave space
+
+  // Initialize all days of the month
+  const numDays = endDate.getDate()
+  for (let i = 1; i <= numDays; i++) {
+    const dStr = `${targetYear}-${String(targetMonth).padStart(2, '0')}-${String(i).padStart(2, '0')}`
+    viewMap[dStr] = 0
+    pubMap[dStr] = 0
+    ownMap[dStr] = 0
+    refMap[dStr] = 0
+  }
+
+  let totalViews = 0
+  let totalPublisher = 0
+  let totalOwner = 0
+
+  rawDailyStats.forEach(s => {
+    const day = s.createdAt.toISOString().split('T')[0]
+    if (viewMap[day] !== undefined) {
+      viewMap[day] += 1
+      pubMap[day] += s.publisherPrice || 0
+      ownMap[day] += s.advertiserPrice || 0
+      
+      totalViews++
+      totalPublisher += s.publisherPrice || 0
+      totalOwner += s.advertiserPrice || 0
+    }
+  })
+
+  const dailyViews = Object.entries(viewMap).map(([date, count]) => ({ date, count }))
+  const dailyRevenue = Object.entries(pubMap).map(([date, amount]) => ({ date, amount }))
+  const dailyBreakdown = Object.keys(pubMap).map(date => ({
+    date,
+    publisher: pubMap[date] || 0,
+    owner: ownMap[date] || 0,
+    referral: refMap[date] || 0,
+  })).sort((a, b) => a.date.localeCompare(b.date))
+
+  // Generate last 12 months for selector
+  const months = []
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    months.push({
+      value: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+      label: d.toLocaleString('default', { month: 'long', year: 'numeric' })
+    })
+  }
+  const currentMonthStr = `${targetYear}-${String(targetMonth).padStart(2, '0')}`
 
   return (
-    <div className="space-y-6">
-      <div><h1 className="text-3xl font-black font-display"><span className="gradient-text">Reports</span></h1>
-        <p className="text-muted-foreground mt-1">Platform analytics — last 30 days</p></div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: 'Total Views', value: totalViews.toLocaleString(), icon: Eye, chipClass: 'icon-chip-purple' },
-          { label: 'Paid Views', value: paidViews.toLocaleString(), icon: BarChart3, chipClass: 'icon-chip-cyan' },
-          { label: 'Payouts', value: `$${(totalEarnings._sum.publisherPrice ?? 0).toFixed(2)}`, icon: TrendingUp, chipClass: 'icon-chip-green' },
-        ].map(s => (
-          <Card key={s.label} className="glass border-border/50 stat-card">
-            <CardContent className="pt-5">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${s.chipClass}`}>
-                <s.icon className="w-5 h-5" />
-              </div>
-              <p className="text-2xl font-black font-display">{s.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black font-display">
+            Revenue <span className="gradient-text">Reports</span>
+          </h1>
+          <p className="text-muted-foreground mt-1">Detailed breakdown of platform earnings</p>
+        </div>
+        
+        {/* Month selector */}
+        <MonthSelector months={months} currentMonthStr={currentMonthStr} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="glass border-border/50">
-          <CardHeader><CardTitle className="text-base">Top Countries</CardTitle></CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {topCountries.map((c, i) => (
-                <div key={c.country} className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-                  <span className="text-sm flex-1">{c.country}</span>
-                  <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full gradient-bg-primary" style={{ width: `${(c._count / (topCountries[0]?._count ?? 1)) * 100}%` }} />
-                  </div>
-                  <span className="text-xs text-muted-foreground w-10 text-right">{c._count}</span>
-                </div>
-              ))}
-              {topCountries.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No data yet</p>}
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <Card className="glass border-border/50 stat-card">
+          <CardContent className="pt-6">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 icon-chip-purple">
+              <BarChart3 className="w-5 h-5" />
             </div>
+            <p className="text-3xl font-black font-display">{totalViews.toLocaleString()}</p>
+            <p className="text-sm text-muted-foreground mt-1">Total Clicks</p>
           </CardContent>
         </Card>
-        <Card className="glass border-border/50">
-          <CardHeader><CardTitle className="text-base">Top Links</CardTitle></CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {topLinks.map((l, i) => (
-                <div key={l.alias} className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
-                  <span className="text-sm text-primary font-mono flex-1 truncate">/{l.alias}</span>
-                  <span className="text-xs font-semibold">{l.hits.toLocaleString()}</span>
-                </div>
-              ))}
-              {topLinks.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No links yet</p>}
+        
+        <Card className="glass border-border/50 stat-card">
+          <CardContent className="pt-6">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 icon-chip-amber">
+              <Users className="w-5 h-5" />
             </div>
+            <p className="text-3xl font-black font-display text-emerald-400">${totalPublisher.toFixed(4)}</p>
+            <p className="text-sm text-muted-foreground mt-1">Publisher Earnings</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="glass border-border/50 stat-card">
+          <CardContent className="pt-6">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 icon-chip-green">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <p className="text-3xl font-black font-display text-primary">${totalOwner.toFixed(4)}</p>
+            <p className="text-sm text-muted-foreground mt-1">Owner Earnings</p>
           </CardContent>
         </Card>
       </div>
+
+      <AdminCharts dailyViews={dailyViews} dailyRevenue={dailyRevenue} dailyBreakdown={dailyBreakdown} />
     </div>
   )
 }

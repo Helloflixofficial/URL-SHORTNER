@@ -10,6 +10,7 @@ export const metadata = { title: 'Admin — Blog Posts' }
 export default async function AdminPostsPage() {
   const posts = await prisma.post.findMany({ orderBy: { createdAt: 'desc' } })
   return (
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black font-display">

@@ -17,7 +17,9 @@ export default async function DashboardPage() {
   if (!session?.user) redirect('/login')
   const userId = session.user.id!
 
-  const [user, totalLinks, totalHits, recentLinks, earnings, rawCountryStats, rawDeviceStats, rawDailyStats, announcements] = await Promise.all([
+  const startOfToday = startOfDay(new Date())
+
+  const [user, totalLinks, totalHits, recentLinks, earnings, todayEarnings, referralsCount, rawCountryStats, rawDeviceStats, rawDailyStats, announcements] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { balance: true, totalEarned: true, username: true } }),
     prisma.link.count({ where: { userId, status: { not: 3 } } }),
     prisma.link.aggregate({ where: { userId, status: { not: 3 } }, _sum: { hits: true } }),
@@ -28,6 +30,8 @@ export default async function DashboardPage() {
       select: { id: true, alias: true, url: true, title: true, hits: true, createdAt: true, adType: true },
     }),
     prisma.statistic.aggregate({ where: { userId, reason: 1 }, _sum: { publisherPrice: true } }),
+    prisma.statistic.aggregate({ where: { userId, reason: 1, createdAt: { gte: startOfToday } }, _sum: { publisherPrice: true } }),
+    prisma.user.count({ where: { referralId: userId } }),
     prisma.statistic.groupBy({
       by: ['country'],
       where: { userId, reason: 1 },
@@ -63,10 +67,10 @@ export default async function DashboardPage() {
   const dailyStats = Object.entries(dayMap).map(([date, count]) => ({ date, count }))
 
   const stats = [
-    { label: 'Total Links', value: totalLinks.toLocaleString(), icon: Link2, chipClass: 'icon-chip-purple' },
     { label: 'Total Clicks', value: (totalHits._sum.hits ?? 0).toLocaleString(), icon: Eye, chipClass: 'icon-chip-cyan' },
+    { label: 'Earnings Today', value: `$${(todayEarnings._sum.publisherPrice ?? 0).toFixed(4)}`, icon: DollarSign, chipClass: 'icon-chip-amber' },
     { label: 'Total Earned', value: `$${(earnings._sum.publisherPrice ?? 0).toFixed(4)}`, icon: TrendingUp, chipClass: 'icon-chip-green' },
-    { label: 'Balance', value: `$${(user?.balance ?? 0).toFixed(2)}`, icon: DollarSign, chipClass: 'icon-chip-amber' },
+    { label: 'Total Referrals', value: referralsCount.toLocaleString(), icon: Link2, chipClass: 'icon-chip-purple' },
   ]
 
   const adTypeLabel = (t: number) => ({ 0: 'Direct', 1: 'Interstitial', 2: 'Banner', 3: 'Random' }[t] ?? 'Unknown')

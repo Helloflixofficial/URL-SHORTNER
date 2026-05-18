@@ -39,6 +39,9 @@
 
 :root {
   color-scheme: dark;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 56px;
 }
 
 html {
@@ -214,3 +217,40 @@ body {
 /* ─── Toast ─── */
 .toast-success { border-left: 4px solid hsl(152 76% 47%); }
 .toast-error { border-left: 4px solid hsl(0 84% 60%); }
+
+/* ─── Nav section label ─── */
+.nav-section-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  padding: 0.5rem 0.75rem 0.25rem;
+  opacity: 0.7;
+}
+
+/* ─── Sidebar collapse transition ─── */
+.sidebar-transition {
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* ─── Icon chip blue (extra) ─── */
+.icon-chip-blue { background: hsl(220 80% 60% / 0.15); color: hsl(220 80% 65%); }
+.icon-chip-pink { background: hsl(330 80% 60% / 0.15); color: hsl(330 80% 65%); }
+
+/* ─── Topbar ─── */
+.topbar {
+  height: var(--topbar-height);
+  border-bottom: 1px solid hsl(0 0% 100% / 0.07);
+  backdrop-filter: blur(12px);
+  background: hsl(222 47% 4% / 0.8);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
