@@ -15,7 +15,7 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
 interface AdminTopbarProps {
-  user: { name?: string | null; email?: string | null; image?: string | null }
+  user: { name?: string | null; email?: string | null; image?: string | null; role?: string }
   title?: string
   pendingCount?: number
   onToggleSidebar?: () => void
@@ -83,6 +83,17 @@ export default function AdminTopbar({ user, title, pendingCount = 0, onToggleSid
               <p className="text-muted-foreground font-normal truncate">{user.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="text-xs cursor-pointer">Admin Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard" className="text-xs cursor-pointer">Member Dashboard</Link>
+            </DropdownMenuItem>
+            {user.role === 'owner' && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin/admins" className="text-xs cursor-pointer">Manage Admins</Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link href="/admin/settings" className="text-xs cursor-pointer">Settings</Link>
             </DropdownMenuItem>

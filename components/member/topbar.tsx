@@ -75,9 +75,14 @@ export default function MemberTopbar({ user, balance, onToggleSidebar }: MemberT
             <DropdownMenuItem asChild>
               <Link href="/settings" className="text-xs cursor-pointer">Profile Settings</Link>
             </DropdownMenuItem>
-            {user.role === 'admin' && (
+            {(user.role === 'admin' || user.role === 'owner') && (
               <DropdownMenuItem asChild>
                 <Link href="/admin" className="text-xs cursor-pointer text-primary">Admin Panel</Link>
+              </DropdownMenuItem>
+            )}
+            {user.role === 'owner' && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin/admins" className="text-xs cursor-pointer text-primary">Manage Admins</Link>
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
