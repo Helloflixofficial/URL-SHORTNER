@@ -69,10 +69,17 @@ export default function Navbar() {
                     <LayoutDashboard className="w-4 h-4" /> Dashboard
                   </Link>
                 </DropdownMenuItem>
-                {(session.user as { role?: string }).role === 'admin' && (
+                {((session.user as { role?: string }).role === 'admin' || (session.user as { role?: string }).role === 'owner') && (
                   <DropdownMenuItem asChild>
-                    <Link href="/admin" className="flex items-center gap-2 cursor-pointer">
+                    <Link href="/admin" className="flex items-center gap-2 cursor-pointer text-primary">
                       <Shield className="w-4 h-4" /> Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {(session.user as { role?: string }).role === 'owner' && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/admins" className="flex items-center gap-2 cursor-pointer text-primary">
+                      <Shield className="w-4 h-4" /> Manage Admins
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -134,6 +141,16 @@ export default function Navbar() {
                     <Button asChild variant="outline" onClick={() => setMobileOpen(false)}>
                       <Link href="/dashboard"><LayoutDashboard className="w-4 h-4 mr-2" />Dashboard</Link>
                     </Button>
+                    {((session.user as { role?: string }).role === 'admin' || (session.user as { role?: string }).role === 'owner') && (
+                      <Button asChild variant="outline" className="text-primary border-primary/20" onClick={() => setMobileOpen(false)}>
+                        <Link href="/admin"><Shield className="w-4 h-4 mr-2" />Admin Panel</Link>
+                      </Button>
+                    )}
+                    {(session.user as { role?: string }).role === 'owner' && (
+                      <Button asChild variant="outline" className="text-primary border-primary/20" onClick={() => setMobileOpen(false)}>
+                        <Link href="/admin/admins"><Shield className="w-4 h-4 mr-2" />Manage Admins</Link>
+                      </Button>
+                    )}
                     <Button variant="ghost" className="text-destructive justify-start"
                       onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false) }}>
                       <LogOut className="w-4 h-4 mr-2" /> Sign Out
