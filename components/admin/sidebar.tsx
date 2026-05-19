@@ -55,7 +55,7 @@ const navSections = [
 ]
 
 interface Props {
-  user: { name?: string | null; email?: string | null; image?: string | null }
+  user: { name?: string | null; email?: string | null; image?: string | null; role?: string }
   collapsed?: boolean
   onCollapseChange?: (v: boolean) => void
 }
@@ -96,11 +96,17 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
 
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto">
-        {navSections.map((section) => (
+        {navSections.map((section) => {
+          let items = section.items
+          if (section.label === 'System' && user?.role === 'owner') {
+            items = [{ href: '/admin/admins', icon: Shield, label: 'Admins' }, ...items]
+          }
+          
+          return (
           <div key={section.label}>
             {!slim && <p className="nav-section-label">{section.label}</p>}
             {slim && <div className="h-px bg-border/30 mx-3 my-1.5" />}
-            {section.items.map((item) => {
+            {items.map((item) => {
               const active = isActive(item.href, (item as { exact?: boolean }).exact)
               return (
                 <Link
@@ -122,7 +128,8 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
               )
             })}
           </div>
-        ))}
+          )
+        })}
       </nav>
 
       {/* User footer */}

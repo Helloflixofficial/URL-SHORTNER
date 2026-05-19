@@ -39,8 +39,8 @@ export default function LoginPage() {
         toast.error('Invalid email or password')
       } else {
         toast.success('Welcome back!')
-        router.push('/dashboard')
-        router.refresh()
+        // Force a hard navigation so session is properly refreshed in middleware/providers
+        window.location.href = '/dashboard'
       }
     } finally {
       setLoading(false)
