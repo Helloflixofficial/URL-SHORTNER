@@ -84,10 +84,10 @@ export default function AdminLinksTable({ links, total, page, pageSize, searchQu
                 </Button>
               </TableHead>
               <TableHead>Short Link</TableHead>
-              <TableHead>User</TableHead>
-              <TableHead>Destination</TableHead>
+              <TableHead className="hidden sm:table-cell">User</TableHead>
+              <TableHead className="hidden md:table-cell">Destination</TableHead>
               <TableHead>Clicks</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead className="hidden lg:table-cell">Created</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -101,10 +101,10 @@ export default function AdminLinksTable({ links, total, page, pageSize, searchQu
                     </Button>
                   </TableCell>
                   <TableCell><span className="text-primary font-mono text-sm">/{l.alias}</span></TableCell>
-                  <TableCell><span className="text-sm font-medium">{l.user.username}</span></TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground truncate block max-w-[180px]">{l.url}</span></TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="text-sm font-medium">{l.user.username}</span></TableCell>
+                  <TableCell className="hidden md:table-cell"><span className="text-xs text-muted-foreground truncate block max-w-[180px]">{l.url}</span></TableCell>
                   <TableCell><span className="font-semibold text-primary">{l.hits.toLocaleString()}</span></TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(l.createdAt), { addSuffix: true })}</span></TableCell>
+                  <TableCell className="hidden lg:table-cell"><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(l.createdAt), { addSuffix: true })}</span></TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="w-4 h-4" /></Button></DropdownMenuTrigger>

@@ -254,3 +254,34 @@ body {
   top: 0;
   z-index: 30;
 }
+
+/* ─── Scrollbar hide (for horizontal tab strips on mobile) ─── */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Mobile responsive global ─── */
+@media (max-width: 640px) {
+  .topbar {
+    padding: 0 0.75rem;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-featured {
+    transform: scale(1);
+  }
+}

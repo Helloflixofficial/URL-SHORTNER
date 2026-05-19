@@ -7,12 +7,13 @@ import {
   LayoutDashboard, Users, Link2, Megaphone, ArrowDownToLine,
   CreditCard, FileText, BookOpen, MessageSquare, Star,
   Settings, LogOut, Shield, TrendingUp, BarChart3,
-  ChevronLeft, ChevronRight, UserCheck, Globe,
+  ChevronLeft, ChevronRight, UserCheck, Globe, Bell,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Menu } from 'lucide-react'
 
 const navSections = [
@@ -58,9 +59,10 @@ interface Props {
   user: { name?: string | null; email?: string | null; image?: string | null; role?: string }
   collapsed?: boolean
   onCollapseChange?: (v: boolean) => void
+  pendingCount?: number
 }
 
-export default function AdminSidebar({ user, collapsed = false, onCollapseChange }: Props) {
+export default function AdminSidebar({ user, collapsed = false, onCollapseChange, pendingCount = 0 }: Props) {
   const pathname = usePathname()
 
   const isActive = (href: string, exact = false) =>
@@ -173,24 +175,60 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
   return (
     <>
       {/* Mobile */}
-      <div className="md:hidden flex items-center justify-between px-4 h-14 bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="md:hidden flex items-center justify-between px-3 h-14 bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
+        <Link href="/admin" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center gradient-bg-primary">
             <Shield className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
           <span className="gradient-text font-black text-lg font-display">Admin Panel</span>
         </Link>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Open admin sidebar">
-              <Menu className="w-5 h-5" />
+        <div className="flex items-center gap-1">
+          {/* Bell */}
+          <Link href="/admin/announcements" className="relative">
+            <Button variant="ghost" size="icon" className="w-9 h-9 text-muted-foreground" aria-label="Announcements">
+              <Bell className="w-4 h-4" />
             </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 flex flex-col bg-card border-r border-border/50">
-            <SheetTitle className="sr-only">Admin Menu</SheetTitle>
-            <SidebarInner />
-          </SheetContent>
-        </Sheet>
+            {pendingCount > 0 && (
+              <span className="absolute -top-0.5 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {pendingCount > 9 ? '9+' : pendingCount}
+              </span>
+            )}
+          </Link>
+          {/* Avatar */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-full outline-none ring-2 ring-border/50">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={user.image ?? ''} />
+                  <AvatarFallback className="bg-primary/20 text-primary font-semibold uppercase text-xs">
+                    {user.name?.[0]?.toUpperCase() ?? 'A'}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-card border-border/50">
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard" className="text-xs cursor-pointer">Member Dashboard</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: '/' })}>
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Hamburger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-9 h-9" aria-label="Open admin sidebar">
+                <Menu className="w-5 h-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0 flex flex-col bg-card border-r border-border/50">
+              <SheetTitle className="sr-only">Admin Menu</SheetTitle>
+              <SidebarInner />
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       {/* Desktop — controlled by parent collapse state */}

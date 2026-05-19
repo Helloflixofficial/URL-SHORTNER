@@ -100,20 +100,20 @@ export default async function DashboardPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-black font-display">
+          <h1 className="text-2xl sm:text-3xl font-black font-display">
             Welcome back, <span className="gradient-text">{user?.username}</span> 👋
           </h1>
-          <p className="text-muted-foreground mt-1">Here&apos;s your performance overview</p>
+          <p className="text-muted-foreground mt-1 text-sm">Here&apos;s your performance overview</p>
         </div>
-        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
+        <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground w-full sm:w-auto">
           <Link href="/links/new"><Plus className="w-4 h-4 mr-2" />New Link</Link>
         </Button>
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {stats.map((s) => (
           <Card key={s.label} className="glass border-border/50 hover:border-primary/20 transition-all stat-card">
             <CardContent className="pt-6">

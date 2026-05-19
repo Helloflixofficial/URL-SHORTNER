@@ -23,7 +23,7 @@ interface AdminTopbarProps {
 
 export default function AdminTopbar({ user, title, pendingCount = 0, onToggleSidebar }: AdminTopbarProps) {
   return (
-    <div className="topbar w-full">
+    <div className="topbar w-full hidden md:flex">
       {/* Left: sidebar toggle + title */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {onToggleSidebar && (
@@ -38,7 +38,7 @@ export default function AdminTopbar({ user, title, pendingCount = 0, onToggleSid
           </button>
         )}
         {title && (
-          <h1 className="text-sm font-semibold text-foreground truncate hidden sm:block">{title}</h1>
+          <h1 className="text-sm font-semibold text-foreground truncate">{title}</h1>
         )}
       </div>
 

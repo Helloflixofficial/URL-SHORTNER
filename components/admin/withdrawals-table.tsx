@@ -125,10 +125,10 @@ export default function AdminWithdrawalsTable({ withdrawals, total, page, pageSi
               </TableHead>
               <TableHead>User</TableHead>
               <TableHead>Amount</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Account</TableHead>
+              <TableHead className="hidden sm:table-cell">Method</TableHead>
+              <TableHead className="hidden md:table-cell">Account</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden lg:table-cell">Date</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -152,14 +152,14 @@ export default function AdminWithdrawalsTable({ withdrawals, total, page, pageSi
                     <p className="text-xs text-muted-foreground">{w.user.email}</p>
                   </TableCell>
                   <TableCell><span className="font-bold text-emerald-400">${w.amount.toFixed(2)}</span></TableCell>
-                  <TableCell><span className="capitalize text-sm font-medium">{w.method.replace('_', ' ')}</span></TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground truncate block max-w-[140px] font-mono">{w.accountDetails}</span></TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="capitalize text-sm font-medium">{w.method.replace('_', ' ')}</span></TableCell>
+                  <TableCell className="hidden md:table-cell"><span className="text-xs text-muted-foreground truncate block max-w-[140px] font-mono">{w.accountDetails}</span></TableCell>
                   <TableCell>
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.bg} ${s.color}`}>
                       {s.label}
                     </span>
                   </TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(w.createdAt), { addSuffix: true })}</span></TableCell>
+                  <TableCell className="hidden lg:table-cell"><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(w.createdAt), { addSuffix: true })}</span></TableCell>
                   <TableCell>
                     {isPending && (
                       <DropdownMenu>

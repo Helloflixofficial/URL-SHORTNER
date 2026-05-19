@@ -21,7 +21,7 @@ interface MemberTopbarProps {
 
 export default function MemberTopbar({ user, balance, onToggleSidebar }: MemberTopbarProps) {
   return (
-    <div className="topbar w-full">
+    <div className="topbar w-full hidden md:flex">
       {/* Left: sidebar toggle */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {onToggleSidebar && (

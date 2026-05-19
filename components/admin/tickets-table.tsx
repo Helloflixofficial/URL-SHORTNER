@@ -131,10 +131,10 @@ export default function AdminTicketsTable({ tickets, total, page, pageSize, sear
                 </Button>
               </TableHead>
               <TableHead>Ticket ID & Subject</TableHead>
-              <TableHead>User</TableHead>
-              <TableHead>Priority</TableHead>
+              <TableHead className="hidden sm:table-cell">User</TableHead>
+              <TableHead className="hidden md:table-cell">Priority</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Last Update</TableHead>
+              <TableHead className="hidden lg:table-cell">Last Update</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -156,8 +156,8 @@ export default function AdminTicketsTable({ tickets, total, page, pageSize, sear
                       <p className="text-[10px] text-muted-foreground font-mono">#{t.id.toUpperCase()}</p>
                     </Link>
                   </TableCell>
-                  <TableCell><span className="text-sm font-medium">{t.user.username}</span></TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="text-sm font-medium">{t.user.username}</span></TableCell>
+                  <TableCell className="hidden md:table-cell">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       t.priority === 2 ? 'bg-red-500/10 text-red-500' :
                       t.priority === 1 ? 'bg-amber-500/10 text-amber-500' :
@@ -171,7 +171,7 @@ export default function AdminTicketsTable({ tickets, total, page, pageSize, sear
                       <s.icon className="w-3 h-3" /> {s.label}
                     </span>
                   </TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(t.updatedAt), { addSuffix: true })}</span></TableCell>
+                  <TableCell className="hidden lg:table-cell"><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(t.updatedAt), { addSuffix: true })}</span></TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="w-4 h-4" /></Button></DropdownMenuTrigger>

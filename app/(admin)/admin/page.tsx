@@ -86,18 +86,18 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-black font-display">
+          <h1 className="text-2xl sm:text-3xl font-black font-display">
             Admin <span className="gradient-text">Dashboard</span>
           </h1>
-          <p className="text-muted-foreground mt-1">Platform-wide overview</p>
+          <p className="text-muted-foreground mt-1 text-sm">Platform-wide overview</p>
         </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" className="glass border-border/50">
+        <div className="flex gap-2 flex-wrap">
+          <Button asChild variant="outline" className="glass border-border/50 flex-1 sm:flex-none">
             <Link href="/admin/announcements"><Megaphone className="w-4 h-4 mr-2" /> Notify Users</Link>
           </Button>
-          <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground">
+          <Button asChild className="btn-glow gradient-bg-primary text-primary-foreground flex-1 sm:flex-none">
             <Link href="/admin/invoices"><CreditCard className="w-4 h-4 mr-2" /> Deposits</Link>
           </Button>
         </div>

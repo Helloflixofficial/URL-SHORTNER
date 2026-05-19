@@ -145,11 +145,11 @@ export default function AdminCampaignsTable({ campaigns, total, page, pageSize, 
                 </Button>
               </TableHead>
               <TableHead>Campaign</TableHead>
-              <TableHead>User</TableHead>
+              <TableHead className="hidden sm:table-cell">User</TableHead>
               <TableHead>Budget</TableHead>
-              <TableHead>Spent</TableHead>
+              <TableHead className="hidden md:table-cell">Spent</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
+              <TableHead className="hidden lg:table-cell">Created</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -166,18 +166,18 @@ export default function AdminCampaignsTable({ campaigns, total, page, pageSize, 
                     </Button>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm font-medium">{c.name}</p>
-                    <p className="text-xs text-muted-foreground truncate max-w-[200px]">{c.websiteUrl}</p>
+                    <p className="text-sm font-medium truncate max-w-[120px] sm:max-w-none">{c.name}</p>
+                    <p className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[200px] hidden sm:block">{c.websiteUrl}</p>
                   </TableCell>
-                  <TableCell><span className="text-sm font-medium">{c.user.username}</span></TableCell>
+                  <TableCell className="hidden sm:table-cell"><span className="text-sm font-medium">{c.user.username}</span></TableCell>
                   <TableCell><span className="font-bold">${c.budget.toFixed(2)}</span></TableCell>
-                  <TableCell><span className="text-muted-foreground">${c.spent.toFixed(2)}</span></TableCell>
+                  <TableCell className="hidden md:table-cell"><span className="text-muted-foreground">${c.spent.toFixed(2)}</span></TableCell>
                   <TableCell>
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.bg} ${s.color}`}>
                       {s.label}
                     </span>
                   </TableCell>
-                  <TableCell><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(c.createdAt), { addSuffix: true })}</span></TableCell>
+                  <TableCell className="hidden lg:table-cell"><span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(c.createdAt), { addSuffix: true })}</span></TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="w-4 h-4" /></Button></DropdownMenuTrigger>

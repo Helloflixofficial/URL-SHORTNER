@@ -56,21 +56,23 @@ export default function StatsCharts({ countryStats, deviceStats, dailyStats }: P
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill="url(#chartGrad)" radius={[4, 4, 0, 0]} />
-              <defs>
-                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--color-chart-1)" />
-                  <stop offset="100%" stopColor="var(--color-chart-2)" />
-                </linearGradient>
-              </defs>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-[180px] sm:h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--color-muted-foreground)' }} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--color-muted-foreground)' }} width={32} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="count" fill="url(#chartGrad)" radius={[4, 4, 0, 0]} />
+                <defs>
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--color-chart-1)" />
+                    <stop offset="100%" stopColor="var(--color-chart-2)" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 

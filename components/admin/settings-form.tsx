@@ -62,36 +62,57 @@ export default function AdminSettingsForm({ options }: Props) {
   const activeTabData = TABS.find(t => t.id === activeTab)
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
-      {/* Sidebar Navigation */}
-      <div className="w-full md:w-64 shrink-0 flex flex-col gap-1 sticky top-24">
+    <div className="flex flex-col gap-6 md:gap-8">
+      {/* Mobile: horizontal scrollable tabs */}
+      <div className="flex md:hidden overflow-x-auto gap-1 pb-1 -mx-4 px-4 scrollbar-hide">
         {TABS.map(t => (
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
             className={cn(
-              'flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group',
-              activeTab === t.id 
-                ? 'bg-primary/10 text-primary font-semibold ring-1 ring-primary/20 shadow-sm' 
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+              'flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all',
+              activeTab === t.id
+                ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
+                : 'text-muted-foreground bg-muted/30 hover:bg-muted/60'
             )}
           >
-            <div className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
-              activeTab === t.id ? "bg-primary text-primary-foreground shadow-md" : "bg-card border border-border/50 group-hover:border-border"
-            )}>
-              <t.icon className="w-4 h-4" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm">{t.label}</p>
-            </div>
-            {activeTab === t.id && <ChevronRight className="w-4 h-4 text-primary" />}
+            <t.icon className="w-3.5 h-3.5 shrink-0" />
+            {t.label}
           </button>
         ))}
       </div>
 
-      {/* Content Area */}
-      <div className="flex-1 min-w-0 w-full max-w-4xl">
+      {/* Desktop: sidebar + content */}
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+        {/* Sidebar Navigation — desktop only */}
+        <div className="hidden md:flex w-64 shrink-0 flex-col gap-1 sticky top-24">
+          {TABS.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={cn(
+                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left group',
+                activeTab === t.id
+                  ? 'bg-primary/10 text-primary font-semibold ring-1 ring-primary/20 shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+              )}
+            >
+              <div className={cn(
+                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                activeTab === t.id ? "bg-primary text-primary-foreground shadow-md" : "bg-card border border-border/50 group-hover:border-border"
+              )}>
+                <t.icon className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm">{t.label}</p>
+              </div>
+              {activeTab === t.id && <ChevronRight className="w-4 h-4 text-primary" />}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 min-w-0 w-full max-w-4xl">
         <Card className="glass border-border/50 shadow-xl overflow-hidden">
           <CardHeader className="border-b border-border/30 bg-muted/10 pb-6">
             <div className="flex items-center gap-3">
@@ -411,6 +432,7 @@ export default function AdminSettingsForm({ options }: Props) {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )

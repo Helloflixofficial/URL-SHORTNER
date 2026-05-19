@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
-import { Menu } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Menu, DollarSign } from 'lucide-react'
 
 const navSections = [
   {
@@ -177,24 +178,59 @@ export default function DashboardSidebar({ user, balance, collapsed = false, onC
   return (
     <>
       {/* Mobile header */}
-      <div className="md:hidden flex items-center justify-between px-4 h-14 bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
+      <div className="md:hidden flex items-center justify-between px-3 h-14 bg-background/80 backdrop-blur-sm border-b border-border/50 sticky top-0 z-40">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center gradient-bg-primary">
             <Link2 className="w-4 h-4 text-primary-foreground" />
           </div>
           <span className="gradient-text font-black text-xl font-display">Linksite</span>
         </Link>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Open sidebar menu">
-              <Menu className="w-5 h-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-0 flex flex-col bg-card border-r border-border/50">
-            <SheetTitle className="sr-only">Menu</SheetTitle>
-            <SidebarInner />
-          </SheetContent>
-        </Sheet>
+        <div className="flex items-center gap-1">
+          {/* Balance chip */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full border border-primary/20 gradient-bg-card text-xs font-semibold">
+            <DollarSign className="w-3 h-3 text-primary" />
+            <span className="gradient-text">${balance.toFixed(2)}</span>
+          </div>
+          {/* Avatar */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-full outline-none ring-2 ring-border/50 ml-0.5">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={user.image ?? ''} />
+                  <AvatarFallback className="bg-primary/20 text-primary font-semibold uppercase text-xs">
+                    {user.name?.[0]?.toUpperCase() ?? 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-card border-border/50">
+              <DropdownMenuItem asChild>
+                <Link href="/settings" className="text-xs cursor-pointer">Settings</Link>
+              </DropdownMenuItem>
+              {(user.role === 'admin' || user.role === 'owner') && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin" className="text-xs cursor-pointer text-primary">Admin Panel</Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: '/' })}>
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Hamburger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-9 h-9" aria-label="Open sidebar menu">
+                <Menu className="w-5 h-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0 flex flex-col bg-card border-r border-border/50">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SidebarInner />
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       {/* Desktop sidebar */}
