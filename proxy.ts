@@ -11,7 +11,8 @@ export async function proxy(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    if ((session.user as { role?: string }).role !== 'admin') {
+    const role = (session.user as { role?: string }).role
+    if (role !== 'admin' && role !== 'owner') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
@@ -25,6 +26,10 @@ export async function proxy(request: NextRequest) {
 
   // Redirect logged-in users away from auth pages
   if ((pathname === '/login' || pathname === '/register') && session?.user) {
+    const role = (session.user as { role?: string }).role
+    if (role === 'admin' || role === 'owner') {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
