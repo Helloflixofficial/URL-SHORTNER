@@ -39,8 +39,9 @@ export default function LoginPage() {
         toast.error('Invalid email or password')
       } else {
         toast.success('Welcome back!')
-        // Force a hard navigation so session is properly refreshed in middleware/providers
-        window.location.href = '/dashboard'
+        // Navigate to /admin. The middleware (proxy.ts) will automatically bounce 
+        // normal members back to /dashboard, while letting owners/admins through.
+        window.location.href = '/admin'
       }
     } finally {
       setLoading(false)

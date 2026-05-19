@@ -5,7 +5,7 @@ import AdminTopbar from '@/components/admin/topbar'
 import { ReactNode } from 'react'
 
 interface AdminShellProps {
-  user: { name?: string | null; email?: string | null; image?: string | null }
+  user: { name?: string | null; email?: string | null; image?: string | null; role?: string }
   pendingCount?: number
   children: ReactNode
 }
