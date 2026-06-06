@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { isAdminRole } from '@/lib/roles'
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -8,7 +9,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params
   const linkId = id
   const userId = session.user.id!
-  const isAdmin = (session.user as { role?: string }).role === 'admin'
+  const isAdmin = isAdminRole((session.user as { role?: string }).role)
 
   const link = await prisma.link.findUnique({ where: { id: linkId } })
   if (!link) return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -25,9 +26,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const linkId = id
   const userId = session.user.id!
   const body = await req.json()
+  const isAdmin = isAdminRole((session.user as { role?: string }).role)
 
   const link = await prisma.link.findUnique({ where: { id: linkId } })
-  if (!link || link.userId !== userId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!link) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!isAdmin && link.userId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const updated = await prisma.link.update({
     where: { id: linkId },

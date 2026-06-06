@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
-import { Shield, Plus, ShieldCheck, Mail, User, Lock, Loader2 } from 'lucide-react'
+import { Shield, Plus, ShieldCheck, Mail, User, Lock, Loader2, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -45,6 +45,23 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
       toast.error(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete administrator "${name}"? This cannot be undone.`)) return
+    
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete administrator')
+      
+      toast.success('Administrator deleted successfully')
+      router.refresh()
+    } catch (err: any) {
+      toast.error(err.message)
     }
   }
 
@@ -134,6 +151,7 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
               <th className="px-4 py-3 font-medium text-left">Role</th>
               <th className="px-4 py-3 font-medium text-left">Status</th>
               <th className="px-4 py-3 font-medium text-left">Created</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -165,6 +183,21 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">
                   {format(new Date(admin.createdAt), 'MMM d, yyyy')}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {admin.role !== 'owner' ? (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 px-2 rounded-md"
+                      onClick={() => handleDelete(admin.id, admin.username)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </Button>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic pr-2">System Owner</span>
+                  )}
                 </td>
               </tr>
             ))}

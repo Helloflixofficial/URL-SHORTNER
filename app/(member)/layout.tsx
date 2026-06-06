@@ -7,10 +7,15 @@ export default async function MemberLayout({ children }: { children: React.React
   const session = await auth()
   if (!session?.user) redirect('/login')
 
+  // DB freshness check — re-verify status/balance from database so banned
+  // users cannot continue using the dashboard with a stale JWT.
   const user = await prisma.user.findUnique({
     where: { id: session.user.id! },
-    select: { balance: true },
+    select: { balance: true, status: true },
   })
+
+  // Redirect banned/inactive/deleted users immediately
+  if (!user || user.status !== 'active') redirect('/login')
 
   return (
     <MemberShell
@@ -20,7 +25,7 @@ export default async function MemberLayout({ children }: { children: React.React
         image: session.user.image,
         role: (session.user as { role?: string }).role,
       }}
-      balance={user?.balance ?? 0}
+      balance={user.balance}
     >
       {children}
     </MemberShell>

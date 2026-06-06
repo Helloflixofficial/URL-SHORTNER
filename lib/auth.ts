@@ -3,6 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { isConfiguredOwnerEmail } from '@/lib/roles'
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -36,12 +37,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const passwordMatch = await bcrypt.compare(parsed.data.password, user.password)
         if (!passwordMatch) return null
 
+        const role = isConfiguredOwnerEmail(user.email) ? 'owner' : user.role
+        if (role === 'owner' && user.role !== 'owner') {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role: 'owner' },
+          })
+        }
+
         return {
           id: String(user.id),
           email: user.email,
           name: user.username,
           image: user.avatar,
-          role: user.role,
+          role,
         }
       },
     }),
@@ -52,12 +61,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id
         token.role = (user as { role?: string }).role ?? 'member'
       }
+      if (isConfiguredOwnerEmail(token.email)) {
+        token.role = 'owner'
+      }
       return token
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        (session.user as any).role = token.role as string
+        session.user.role = token.role as string
       }
       return session
     },

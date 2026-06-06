@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
+import { requireOwnerSession } from '@/lib/rbac'
 
 export async function POST(req: Request) {
   try {
-    const session = await auth()
-    if (session?.user?.role !== 'owner') {
+    if (!(await requireOwnerSession())) {
       return NextResponse.json({ error: 'Unauthorized. Only owners can create admins.' }, { status: 403 })
     }
 
@@ -22,6 +21,14 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return NextResponse.json({ error: 'A user with this email already exists' }, { status: 400 })
+    }
+
+    const existingUsername = await prisma.user.findUnique({
+      where: { username }
+    })
+
+    if (existingUsername) {
+      return NextResponse.json({ error: 'A user with this username already exists' }, { status: 400 })
     }
 
     const hashedPassword = await bcrypt.hash(password, 12)
@@ -40,7 +47,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, user: { id: newAdmin.id, email: newAdmin.email } })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating admin:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

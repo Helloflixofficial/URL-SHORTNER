@@ -9,6 +9,13 @@ import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
 import { ArrowLeft, Save } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { requireAdminSession } from '@/lib/rbac'
+import { canManageTargetRole } from '@/lib/roles'
+import type { UserRole, UserStatus } from '@prisma/client'
+
+const roles = ['owner', 'admin', 'member'] as const
+const statuses = ['active', 'inactive', 'banned'] as const
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const p = await params
@@ -17,6 +24,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function AdminUserEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdminSession()
+  if (!session) redirect('/dashboard')
+
   const p = await params
   const user = await prisma.user.findUnique({
     where: { id: p.id },
@@ -24,22 +34,47 @@ export default async function AdminUserEditPage({ params }: { params: Promise<{ 
   })
 
   if (!user) notFound()
+  if (!canManageTargetRole(session.user.role, user.role)) redirect(`/admin/users/${user.id}`)
 
   const plans = await prisma.plan.findMany()
 
   async function updateUser(formData: FormData) {
     'use server'
+    const session = await requireAdminSession()
+    if (!session) throw new Error('Unauthorized')
+
     const status = formData.get('status') as string
     const role = formData.get('role') as string
     const balance = parseFloat(formData.get('balance') as string)
     const planId = formData.get('planId') as string
     const disableEarnings = formData.get('disableEarnings') === 'on'
 
+    const target = await prisma.user.findUnique({
+      where: { id: user!.id },
+      select: { id: true, role: true },
+    })
+    if (!target || !canManageTargetRole(session.user.role, target.role)) {
+      throw new Error('Forbidden')
+    }
+    if (!statuses.includes(status as (typeof statuses)[number])) {
+      throw new Error('Invalid status')
+    }
+    if (!roles.includes(role as (typeof roles)[number])) {
+      throw new Error('Invalid role')
+    }
+    if (role !== target.role && session.user.role !== 'owner') {
+      throw new Error('Only the owner can change roles')
+    }
+    if (target.role === 'owner' && role !== 'owner') {
+      const ownerCount = await prisma.user.count({ where: { role: 'owner' } })
+      if (ownerCount <= 1) throw new Error('At least one owner is required')
+    }
+
     await prisma.user.update({
       where: { id: user!.id },
       data: {
-        status: status as any,
-        role: role as any,
+        status: status as UserStatus,
+        role: role as UserRole,
         balance: isNaN(balance) ? undefined : balance,
         disableEarnings,
         // Update basic info
@@ -104,6 +139,9 @@ export default async function AdminUserEditPage({ params }: { params: Promise<{ 
                     <SelectContent>
                       <SelectItem value="member">Member</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
+                      {(session.user.role === 'owner' || user.role === 'owner') && (
+                        <SelectItem value="owner">Owner</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

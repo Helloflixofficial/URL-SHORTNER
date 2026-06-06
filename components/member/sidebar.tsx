@@ -145,8 +145,10 @@ export default function DashboardSidebar({ user, balance, collapsed = false, onC
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <p className="text-sm font-semibold truncate">{user.name}</p>
-                {user.role === 'admin' && (
-                  <Badge className="text-xs px-1.5 py-0 gradient-bg-primary text-primary-foreground">Admin</Badge>
+                {(user.role === 'admin' || user.role === 'owner') && (
+                  <Badge className="text-xs px-1.5 py-0 gradient-bg-primary text-primary-foreground">
+                    {user.role === 'owner' ? 'Owner' : 'Admin'}
+                  </Badge>
                 )}
               </div>
               <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -236,7 +238,7 @@ export default function DashboardSidebar({ user, balance, collapsed = false, onC
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col h-screen bg-card border-r border-border/50 sticky top-0 sidebar-transition relative',
+          'hidden md:flex flex-col h-screen bg-[#0c101b]/40 backdrop-blur-xl border-r border-white/[0.06] sticky top-0 sidebar-transition relative shadow-[4px_0_24px_rgba(0,0,0,0.15)]',
           collapsed ? 'w-16' : 'w-64',
         )}
       >

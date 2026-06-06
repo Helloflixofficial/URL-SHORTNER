@@ -5,14 +5,7 @@ const footerLinks = {
   Product: [
     { href: '/payout-rates', label: 'Payout Rates' },
     { href: '/payouts', label: 'Payment Proofs' },
-    { href: '/pricing', label: 'Pricing' },
-    { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
-  ],
-  Legal: [
-    { href: '/p/terms', label: 'Terms of Service' },
-    { href: '/p/privacy', label: 'Privacy Policy' },
-    { href: '/p/about', label: 'About Us' },
   ],
   Account: [
     { href: '/login', label: 'Sign In' },

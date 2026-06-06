@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / development artifacts
+scratch/
+scratch_*.js
+scratch_*.ts
+proxy.ts
+
+# local sqlite dev database
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db

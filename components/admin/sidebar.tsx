@@ -5,15 +5,15 @@ import { signOut } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Users, Link2, Megaphone, ArrowDownToLine,
-  CreditCard, FileText, BookOpen, MessageSquare, Star,
+  CreditCard, MessageSquare,
   Settings, LogOut, Shield, TrendingUp, BarChart3,
-  ChevronLeft, ChevronRight, UserCheck, Globe, Bell,
+  ChevronLeft, ChevronRight, UserCheck, Bell,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Menu } from 'lucide-react'
 
 const navSections = [
@@ -34,16 +34,12 @@ const navSections = [
       { href: '/admin/withdrawals', icon: ArrowDownToLine, label: 'Withdrawals' },
       { href: '/admin/payout-rates', icon: TrendingUp, label: 'Payout Rates' },
       { href: '/admin/invoices', icon: CreditCard, label: 'Deposits' },
-      { href: '/admin/plans', icon: FileText, label: 'Plans' },
     ],
   },
   {
     label: 'Content',
     items: [
-      { href: '/admin/posts', icon: BookOpen, label: 'Blog Posts' },
-      { href: '/admin/pages', icon: Globe, label: 'Pages' },
       { href: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
-      { href: '/admin/testimonials', icon: Star, label: 'Testimonials' },
     ],
   },
   {
@@ -207,8 +203,27 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 bg-card border-border/50">
+              <DropdownMenuLabel className="text-xs">
+                <p className="font-semibold">{user.name}</p>
+                <p className="text-muted-foreground font-normal truncate">{user.email}</p>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/admin" className="text-xs cursor-pointer">Admin Dashboard</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard" className="text-xs cursor-pointer">Member Dashboard</Link>
+              </DropdownMenuItem>
+              {user.role === 'owner' && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/admins" className="text-xs cursor-pointer">Manage Admins</Link>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem asChild>
+                <Link href="/admin/settings" className="text-xs cursor-pointer">Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/" className="text-xs cursor-pointer">View Site</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: '/' })}>
@@ -234,7 +249,7 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
       {/* Desktop — controlled by parent collapse state */}
       <aside
         className={cn(
-          'hidden md:flex flex-col h-screen bg-card border-r border-border/50 sticky top-0 sidebar-transition relative',
+          'hidden md:flex flex-col h-screen bg-[#0c101b]/40 backdrop-blur-xl border-r border-white/[0.06] sticky top-0 sidebar-transition relative shadow-[4px_0_24px_rgba(0,0,0,0.15)]',
           collapsed ? 'w-16' : 'w-60',
         )}
       >

@@ -1,12 +1,12 @@
 import Navbar from '@/components/front/navbar'
-import Footer from '@/components/front/footer'
 
 export default function FrontLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
       <Navbar />
-      <main className="flex-1">{children}</main>
-      <Footer />
+      <main className="flex-1 min-h-0 relative overflow-y-auto">
+        {children}
+      </main>
     </div>
   )
 }

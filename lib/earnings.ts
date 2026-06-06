@@ -55,6 +55,36 @@ export interface EarningsResult {
   url: string
 }
 
+export async function recordUnpaidVisit(
+  link: { id: string; userId: string },
+  options: {
+    ip: string
+    country: string
+    device: number
+    adType: number
+    reason?: number
+    refererUrl?: string | null
+  },
+) {
+  await prisma.$transaction([
+    prisma.statistic.create({
+      data: {
+        linkId: link.id,
+        userId: link.userId,
+        ip: options.ip,
+        country: options.country,
+        device: options.device,
+        adType: options.adType,
+        reason: options.reason ?? EARN_REASON.DIRECT,
+        advertiserPrice: 0,
+        publisherPrice: 0,
+        refererUrl: options.refererUrl ?? null,
+      },
+    }),
+    prisma.link.update({ where: { id: link.id }, data: { hits: { increment: 1 } } }),
+  ])
+}
+
 /**
  * Full port of Adlinkfly's calcEarnings() PHP function.
  * Determines whether a view should be paid and at what rate,

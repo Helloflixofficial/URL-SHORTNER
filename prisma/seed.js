@@ -12,10 +12,12 @@ async function main() {
   await prisma.plan.upsert({ where: { id: 3 }, update: {}, create: { name: 'Elite', price: 24.99, linksLimit: -1, linkExpiration: true, direct: true, disableAds: true, disableCaptcha: true, visitorsRemoveCaptcha: true, timer: 0, isDefault: false, features: JSON.stringify(['Unlimited links', 'Direct links (no ads)', 'No ads for visitors', 'No captcha', 'Link expiry', 'Custom alias', '24/7 support']) } })
   console.log('✅ Plans created')
 
-  // Admin user
-  const adminPass = await bcrypt.hash('Admin@123456', 12)
-  const admin = await prisma.user.upsert({ where: { email: 'admin@linksite.io' }, update: {}, create: { username: 'admin', email: 'admin@linksite.io', password: adminPass, role: 'admin', status: 'active', balance: 0 } })
-  console.log('✅ Admin:', admin.email)
+  // Owner user
+  const ownerEmail = process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || 'owner@linksite.io'
+  const ownerPassword = process.env.OWNER_PASSWORD || process.env.ADMIN_PASSWORD || 'Owner@123456'
+  const ownerPass = await bcrypt.hash(ownerPassword, 12)
+  const owner = await prisma.user.upsert({ where: { email: ownerEmail }, update: { role: 'owner', password: ownerPass, status: 'active' }, create: { username: 'owner', email: ownerEmail, password: ownerPass, role: 'owner', status: 'active', balance: 0 } })
+  console.log('✅ Owner:', owner.email)
 
   // Anonymous user
   const anonPass = await bcrypt.hash('anon_' + Math.random(), 12)
@@ -64,8 +66,8 @@ async function main() {
 
   console.log('\n🎉 Done!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log('Admin: admin@linksite.io')
-  console.log('Password: Admin@123456')
+  console.log(`Owner: ${ownerEmail}`)
+  console.log(`Password: ${ownerPassword}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 

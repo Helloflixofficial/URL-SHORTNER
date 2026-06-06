@@ -11,7 +11,7 @@ export default async function AdminDashboardPage() {
   const [
     totalUsers, totalLinks, totalClicks, totalWithdrawals, pendingWithdrawals,
     totalEarnings, rawDailyStats, last24hClicks, pendingInvoices,
-    openTickets, rawCampaigns, recentUsers, recentWithdrawals,
+    openTickets, rawCampaigns, recentUsers, recentWithdrawals, totalCampaigns,
   ] = await Promise.all([
     prisma.user.count({ where: { role: 'member' } }),
     prisma.link.count({ where: { status: { not: 3 } } }),
@@ -39,6 +39,7 @@ export default async function AdminDashboardPage() {
       take: 5,
       include: { user: { select: { username: true } } },
     }),
+    prisma.campaign.count(),
   ])
 
   // Build chart data
@@ -79,7 +80,7 @@ export default async function AdminDashboardPage() {
     { label: 'Total Payouts', value: `$${(totalEarnings._sum.publisherPrice ?? 0).toFixed(2)}`, icon: DollarSign, chipClass: 'icon-chip-amber', href: '/admin/withdrawals' },
     { label: 'Pending Deposits', value: pendingInvoices.toLocaleString(), icon: ArrowDownToLine, chipClass: 'icon-chip-blue', href: '/admin/invoices' },
     { label: 'Pending Payouts', value: pendingWithdrawals.toLocaleString(), icon: DollarSign, chipClass: 'icon-chip-red', href: '/admin/withdrawals' },
-    { label: 'Total Campaigns', value: totalWithdrawals.toLocaleString(), icon: Megaphone, chipClass: 'icon-chip-pink', href: '/admin/campaigns' },
+    { label: 'Total Campaigns', value: totalCampaigns.toLocaleString(), icon: Megaphone, chipClass: 'icon-chip-pink', href: '/admin/campaigns' },
     { label: 'Open Tickets', value: openTickets.toLocaleString(), icon: MessageSquare, chipClass: 'icon-chip-purple', href: '/admin/tickets' },
   ]
 

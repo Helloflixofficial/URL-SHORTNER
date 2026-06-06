@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { generateUniqueAlias, isValidAlias, isReservedAlias, RESERVED_ALIASES } from '@/lib/alias'
+import { generateUniqueAlias, isValidAlias, isReservedAlias } from '@/lib/alias'
 import { getOption } from '@/lib/options'
 import { z } from 'zod'
 
@@ -11,6 +11,25 @@ const shortenSchema = z.object({
   title: z.string().max(200).optional(),
   adType: z.number().int().min(0).max(4).optional().default(1),
 })
+
+const ANONYMOUS_USER_ID = '000000000000000000000001'
+
+async function getAnonymousUserId() {
+  const user = await prisma.user.upsert({
+    where: { id: ANONYMOUS_USER_ID },
+    update: { status: 'active', disableEarnings: true },
+    create: {
+      id: ANONYMOUS_USER_ID,
+      username: 'anonymous',
+      email: 'anonymous@linksite.io',
+      role: 'member',
+      status: 'active',
+      disableEarnings: true,
+    },
+    select: { id: true },
+  })
+  return user.id
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +58,7 @@ export async function POST(req: NextRequest) {
     }
 
     const session = await auth()
-    const userId = session?.user?.id ? session.user.id : "000000000000000000000001" // anonymous
+    const userId = session?.user?.id ? session.user.id : await getAnonymousUserId()
 
     // Resolve alias
     let alias = customAlias?.trim()
@@ -78,7 +97,7 @@ export async function POST(req: NextRequest) {
       data: { url, alias, title: title ?? null, userId, adType: adType ?? 1, status: 1 },
     })
 
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
+    const baseUrl = process.env.NEXTAUTH_URL ?? new URL(req.url).origin
     return NextResponse.json({
       id: link.id,
       alias: link.alias,

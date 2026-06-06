@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { nanoid } from 'nanoid'
+import { generateUniqueAlias } from '@/lib/alias'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -9,24 +9,34 @@ export async function GET(req: NextRequest) {
 
   if (!api || !url) return NextResponse.redirect(new URL('/', req.url))
 
+  let destination: URL
+  try {
+    destination = new URL(url)
+  } catch {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+  if (!['http:', 'https:'].includes(destination.protocol)) {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
   try {
     const user = await prisma.user.findFirst({
       where: { apiToken: api },
       select: { id: true }
     })
 
-    if (!user) return NextResponse.redirect(url)
+    if (!user) return NextResponse.redirect(new URL('/', req.url))
 
     // Find if this link already exists for this user to avoid duplicates
     let link = await prisma.link.findFirst({
-      where: { userId: user.id, url }
+      where: { userId: user.id, url: destination.toString() }
     })
 
     if (!link) {
       link = await prisma.link.create({
         data: {
-          url,
-          alias: nanoid(8),
+          url: destination.toString(),
+          alias: await generateUniqueAlias(6, 8),
           userId: user.id,
           adType: 1,
           status: 1
@@ -34,9 +44,8 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
     return NextResponse.redirect(new URL(`/${link.alias}`, req.url))
   } catch (err) {
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL('/', req.url))
   }
 }

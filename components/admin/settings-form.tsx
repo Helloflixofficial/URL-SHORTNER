@@ -64,7 +64,7 @@ export default function AdminSettingsForm({ options }: Props) {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       {/* Mobile: horizontal scrollable tabs */}
-      <div className="flex md:hidden overflow-x-auto gap-1 pb-1 -mx-4 px-4 scrollbar-hide">
+      <div className="flex md:hidden overflow-x-auto gap-1 pb-2 -mx-4 px-4 scrollbar-hide">
         {TABS.map(t => (
           <button
             key={t.id}
@@ -85,7 +85,7 @@ export default function AdminSettingsForm({ options }: Props) {
       {/* Desktop: sidebar + content */}
       <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
         {/* Sidebar Navigation — desktop only */}
-        <div className="hidden md:flex w-64 shrink-0 flex-col gap-1 sticky top-24">
+        <div className="hidden md:flex w-52 lg:w-64 shrink-0 flex-col gap-1 sticky top-24">
           {TABS.map(t => (
             <button
               key={t.id}
@@ -112,7 +112,7 @@ export default function AdminSettingsForm({ options }: Props) {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 min-w-0 w-full max-w-4xl">
+        <div className="flex-1 min-w-0 w-full">
         <Card className="glass border-border/50 shadow-xl overflow-hidden">
           <CardHeader className="border-b border-border/30 bg-muted/10 pb-6">
             <div className="flex items-center gap-3">

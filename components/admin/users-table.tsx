@@ -66,6 +66,23 @@ export default function AdminUsersTable({ users, total, page, pageSize, searchQu
     }
   }
 
+  const deleteUser = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this user? This cannot be undone.')) return
+    
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to delete user')
+      
+      toast.success('User deleted successfully')
+      router.refresh()
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between gap-4">
@@ -132,7 +149,7 @@ export default function AdminUsersTable({ users, total, page, pageSize, searchQu
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-white/5 text-muted-foreground'}`}>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${u.role === 'owner' ? 'gradient-bg-primary text-primary-foreground' : u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-white/5 text-muted-foreground'}`}>
                     {u.role}
                   </span>
                 </TableCell>
@@ -158,6 +175,14 @@ export default function AdminUsersTable({ users, total, page, pageSize, searchQu
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/users/${u.id}/edit`} className="cursor-pointer">Edit User</Link>
                       </DropdownMenuItem>
+                      {u.role !== 'owner' && (
+                        <DropdownMenuItem 
+                          className="text-red-400 cursor-pointer focus:bg-red-500/10 focus:text-red-400"
+                          onClick={() => deleteUser(u.id)}
+                        >
+                          Delete User
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

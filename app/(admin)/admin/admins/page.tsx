@@ -1,13 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import AdminsClient from './admins-client'
-import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { requireOwnerSession } from '@/lib/rbac'
 
 export const metadata = { title: 'Admin — Manage Admins' }
 
 export default async function AdminsPage() {
-  const session = await auth()
-  if (session?.user?.role !== 'owner') {
+  if (!(await requireOwnerSession())) {
     redirect('/admin')
   }
 

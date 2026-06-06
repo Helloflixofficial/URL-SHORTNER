@@ -147,11 +147,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        By creating an account, you agree to our{' '}
-        <Link href="/p/terms" className="underline hover:text-foreground">Terms</Link>{' '}and{' '}
-        <Link href="/p/privacy" className="underline hover:text-foreground">Privacy Policy</Link>
-      </p>
+
     </div>
   )
 }

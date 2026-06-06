@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getOption } from '@/lib/options'
 import { isBot, getClientIp, getDeviceType, getCountryFromIp } from '@/lib/geo'
-import { getPaidAds } from '@/lib/earnings'
+import { EARN_REASON, getPaidAds, recordUnpaidVisit } from '@/lib/earnings'
 import InterstitialPage from '@/components/ads/interstitial-page'
 import BannerPage from '@/components/ads/banner-page'
 
@@ -11,11 +11,21 @@ interface AliasPageProps {
   params: Promise<{ alias: string }>
 }
 
+function resolveAdType(adType: number) {
+  if (adType !== 3) return adType
+  return Math.random() > 0.5 ? 1 : 2
+}
+
+function getRequestTimestamp() {
+  return Date.now()
+}
+
 export default async function AliasPage({ params }: AliasPageProps) {
   const { alias } = await params
   const headersList = await headers()
   const ua = headersList.get('user-agent') ?? ''
   const ip = getClientIp(headersList)
+  const refererUrl = headersList.get('referer')
 
   const link = await prisma.link.findUnique({
     where: { alias },
@@ -24,8 +34,10 @@ export default async function AliasPage({ params }: AliasPageProps) {
     },
   })
 
-  if (!link || link.status === 3) notFound()
-  if (link.user.status !== 'active') notFound()
+  if (!link) notFound()
+  if (link.status === 3) notFound()
+  const activeLink = link
+  if (activeLink.user.status !== 'active') notFound()
 
   // Expired link
   if (link.expiration && new Date() > link.expiration) {
@@ -40,21 +52,28 @@ export default async function AliasPage({ params }: AliasPageProps) {
   }
 
   // Maintenance mode → direct redirect
-  const maintenance = await getOption('maintenance_mode', '0')
-  if (maintenance === '1') redirect(link.url)
-
-  // Bot detection → direct redirect
-  if (isBot(ua)) redirect(link.url)
-
-  // Determine ad type
-  let adType = link.adType
-  // Random → pick between 1 (interstitial) and 2 (banner)
-  if (adType === 3) adType = Math.random() > 0.5 ? 1 : 2
-  // Direct or no-ad
-  if (adType === 0) redirect(link.url)
-
   const country = getCountryFromIp(ip)
   const device = getDeviceType(ua)
+
+  async function redirectWithUnpaidHit(adType: number, reason = EARN_REASON.DIRECT) {
+    await recordUnpaidVisit(
+      { id: activeLink.id, userId: activeLink.userId },
+      { ip, country, device, adType, reason, refererUrl },
+    )
+    redirect(activeLink.url)
+  }
+
+  const maintenance = await getOption('maintenance_mode', '0')
+  if (maintenance === '1') await redirectWithUnpaidHit(link.adType)
+
+  // Bot detection → direct redirect
+  if (isBot(ua)) await redirectWithUnpaidHit(link.adType)
+
+  // Determine ad type
+  const adType = resolveAdType(activeLink.adType)
+  // Random → pick between 1 (interstitial) and 2 (banner)
+  // Direct or no-ad
+  if (adType === 0) await redirectWithUnpaidHit(adType)
 
   // Get paid ad data
   const adData = await getPaidAds(adType, device, country)
@@ -67,12 +86,12 @@ export default async function AliasPage({ params }: AliasPageProps) {
 
   // Timer from user plan (default 5s)
   const userPlan = await prisma.userPlan.findUnique({
-    where: { userId: link.userId },
+    where: { userId: activeLink.userId },
     include: { plan: true },
   })
   const timer = userPlan?.plan.timer ?? 15
   adData.timer = timer
-  adData.t = Date.now()
+  adData.t = getRequestTimestamp()
 
   // Encode ad form data for client
   const adFormDataEncoded = Buffer.from(JSON.stringify({ ...adData, country, adType })).toString('base64')

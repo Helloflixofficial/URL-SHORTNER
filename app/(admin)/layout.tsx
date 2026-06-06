@@ -1,16 +1,19 @@
-import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import AdminShell from '@/components/admin/admin-shell'
+import { requireAdminSession } from '@/lib/rbac'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+  const session = await requireAdminSession()
   if (!session?.user) redirect('/login')
-  const role = (session.user as { role?: string }).role
-  if (role !== 'admin' && role !== 'owner') redirect('/dashboard')
+  const role = session.user.role
 
-  // Fetch pending counts for the topbar badge
-  const pendingCount = await prisma.announcement.count({ where: { published: true } })
+  // Count items needing admin action: pending withdrawals + open support tickets
+  const [pendingWithdrawals, openTickets] = await Promise.all([
+    prisma.withdrawal.count({ where: { status: 0 } }),
+    prisma.ticket.count({ where: { status: 0 } }),
+  ])
+  const pendingCount = pendingWithdrawals + openTickets
 
   return (
     <AdminShell

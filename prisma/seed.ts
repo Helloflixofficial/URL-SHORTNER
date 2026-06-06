@@ -73,20 +73,22 @@ async function main() {
 
   console.log('✅ Plans created')
 
-  // ---------- Admin user ----------
-  const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD ?? 'Admin@123456', 12)
+  // ---------- Owner user ----------
+  const ownerEmail = process.env.OWNER_EMAIL ?? process.env.ADMIN_EMAIL ?? 'owner@linksite.io'
+  const ownerPlainPassword = process.env.OWNER_PASSWORD ?? process.env.ADMIN_PASSWORD ?? 'Owner@123456'
+  const ownerPassword = await bcrypt.hash(ownerPlainPassword, 12)
   await prisma.user.deleteMany({});
-  const admin = await prisma.user.create({
+  const owner = await prisma.user.create({
     data: {
-      username: 'admin',
-      email: process.env.ADMIN_EMAIL ?? 'admin@linksite.io',
-      password: adminPassword,
-      role: 'admin',
+      username: 'owner',
+      email: ownerEmail,
+      password: ownerPassword,
+      role: 'owner',
       status: 'active',
       balance: 0,
     }
   })
-  console.log('✅ Admin user:', admin.email)
+  console.log('✅ Owner user:', owner.email)
 
   // ---------- Anonymous user (userId = 1 convention) ----------
   const anonPassword = await bcrypt.hash('anonymous_no_login_' + Math.random(), 12)
@@ -197,8 +199,8 @@ async function main() {
 
   console.log('\n🎉 Database seeded successfully!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log(`Admin: ${process.env.ADMIN_EMAIL ?? 'admin@linksite.io'}`)
-  console.log(`Password: ${process.env.ADMIN_PASSWORD ?? 'Admin@123456'}`)
+  console.log(`Owner: ${ownerEmail}`)
+  console.log(`Password: ${ownerPlainPassword}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 
