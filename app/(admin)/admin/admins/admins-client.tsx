@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
-import { Shield, Plus, ShieldCheck, Mail, User, Lock, Loader2, Trash2 } from 'lucide-react'
+import { Shield, Plus, ShieldCheck, Mail, User, Loader2, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,7 +21,6 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: '',
     avatar: ''
   })
 
@@ -39,7 +38,7 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
       
       toast.success('Admin added successfully')
       setOpen(false)
-      setFormData({ username: '', email: '', password: '', avatar: '' })
+      setFormData({ username: '', email: '', avatar: '' })
       router.refresh()
     } catch (err: any) {
       toast.error(err.message)
@@ -110,21 +109,6 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input 
-                    required
-                    type="password"
-                    placeholder="Min 6 characters"
-                    minLength={6}
-                    className="pl-9"
-                    value={formData.password}
-                    onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
                 <Label>Profile Picture URL (Optional)</Label>
                 <Input 
                   placeholder="https://example.com/avatar.png"
@@ -135,7 +119,7 @@ export default function AdminsClient({ admins }: { admins: any[] }) {
               <div className="pt-2">
                 <Button type="submit" className="w-full btn-glow gradient-bg-primary" disabled={loading}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
-                  Create Admin
+                  Save Admin
                 </Button>
               </div>
             </form>

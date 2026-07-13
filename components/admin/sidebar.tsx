@@ -1,14 +1,16 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import { useClerk } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Users, Link2, Megaphone, ArrowDownToLine,
   CreditCard, MessageSquare,
   Settings, LogOut, Shield, TrendingUp, BarChart3,
-  ChevronLeft, ChevronRight, UserCheck, Bell,
+  ChevronLeft, ChevronRight, UserCheck, Bell, HardDrive,
+  FileText, PlusCircle, FolderOpen, Trash2, Sparkles
 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -26,6 +28,7 @@ const navSections = [
       { href: '/admin/campaigns', icon: Megaphone, label: 'Campaigns' },
       { href: '/admin/referrals', icon: UserCheck, label: 'Referrals' },
       { href: '/admin/reports', icon: BarChart3, label: 'Reports' },
+      { href: '/uploads', icon: HardDrive, label: 'Uploads' },
     ],
   },
   {
@@ -40,6 +43,17 @@ const navSections = [
     label: 'Content',
     items: [
       { href: '/admin/announcements', icon: Megaphone, label: 'Announcements' },
+      { href: '/admin/posts', icon: FileText, label: 'All Posts', exact: true },
+      { href: '/admin/posts/new', icon: PlusCircle, label: 'Add New Post' },
+      { href: '/admin/posts/categories', icon: FolderOpen, label: 'Categories & Tags' },
+      { href: '/admin/posts/theme', icon: Sparkles, label: 'Theme' },
+      { href: '/admin/posts/trash', icon: Trash2, label: 'Post Trash' },
+    ],
+  },
+  {
+    label: 'Ads Settings',
+    items: [
+      { href: '/admin/ads', icon: Megaphone, label: 'Blog Ads Options' },
     ],
   },
   {
@@ -51,6 +65,7 @@ const navSections = [
   },
 ]
 
+
 interface Props {
   user: { name?: string | null; email?: string | null; image?: string | null; role?: string }
   collapsed?: boolean
@@ -60,6 +75,7 @@ interface Props {
 
 export default function AdminSidebar({ user, collapsed = false, onCollapseChange, pendingCount = 0 }: Props) {
   const pathname = usePathname()
+  const { signOut } = useClerk()
 
   const isActive = (href: string, exact = false) =>
     exact ? pathname === href : (href === '/admin' ? pathname === '/admin' : pathname.startsWith(href))
@@ -95,6 +111,9 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto">
         {navSections.map((section) => {
+          if (section.label === 'Ads Settings' && user?.role !== 'owner') {
+            return null
+          }
           let items = section.items
           if (section.label === 'System' && user?.role === 'owner') {
             items = [{ href: '/admin/admins', icon: Shield, label: 'Admins' }, ...items]
@@ -158,7 +177,7 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
           variant="ghost"
           size="sm"
           className={cn('w-full justify-start text-xs text-muted-foreground hover:text-destructive gap-1.5', slim && 'justify-center px-0')}
-          onClick={() => signOut({ callbackUrl: '/' })}
+          onClick={() => signOut({ redirectUrl: '/' })}
           title={slim ? 'Sign Out' : undefined}
         >
           <LogOut className="w-3.5 h-3.5" />
@@ -226,7 +245,7 @@ export default function AdminSidebar({ user, collapsed = false, onCollapseChange
                 <Link href="/" className="text-xs cursor-pointer">View Site</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: '/' })}>
+              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ redirectUrl: '/' })}>
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>

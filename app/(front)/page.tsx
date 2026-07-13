@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <section className="hero-bg relative h-full w-full flex items-center justify-center py-6 md:py-12 px-4 overflow-hidden">
+    <section className="hero-bg relative w-full flex items-center justify-center py-6 md:py-12 px-4 overflow-hidden min-h-[calc(100vh-56px)]">
       <div className="relative z-10 text-center max-w-4xl mx-auto w-full">
         {/* <div className="inline-flex items-center gap-2 glass border border-primary/30 rounded-full px-4 py-1.5 text-xs md:text-sm text-muted-foreground mb-4 md:mb-6"> */}
         {/* <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> */}

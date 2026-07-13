@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
 import { requireOwnerSession } from '@/lib/rbac'
 
 export async function POST(req: Request) {
@@ -9,10 +8,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized. Only owners can create admins.' }, { status: 403 })
     }
 
-    const { username, email, password, avatar } = await req.json()
+    const { username, email, avatar } = await req.json()
 
-    if (!username || !email || !password || password.length < 6) {
-      return NextResponse.json({ error: 'Invalid input. Please provide a valid email, username, and a password (min 6 chars).' }, { status: 400 })
+    if (!username || !email) {
+      return NextResponse.json({ error: 'Invalid input. Please provide a username and email.' }, { status: 400 })
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -20,7 +19,21 @@ export async function POST(req: Request) {
     })
 
     if (existingUser) {
-      return NextResponse.json({ error: 'A user with this email already exists' }, { status: 400 })
+      if (existingUser.role === 'owner') {
+        return NextResponse.json({ error: 'The owner account cannot be changed here' }, { status: 400 })
+      }
+
+      const updatedAdmin = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          username,
+          role: 'admin',
+          status: 'active',
+          avatar: avatar || existingUser.avatar,
+        },
+      })
+
+      return NextResponse.json({ success: true, user: { id: updatedAdmin.id, email: updatedAdmin.email } })
     }
 
     const existingUsername = await prisma.user.findUnique({
@@ -31,13 +44,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'A user with this username already exists' }, { status: 400 })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12)
-
     const newAdmin = await prisma.user.create({
       data: {
         username,
         email: email.toLowerCase(),
-        password: hashedPassword,
         role: 'admin',
         status: 'active',
         avatar: avatar || null,

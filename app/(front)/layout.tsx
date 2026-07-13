@@ -1,12 +1,17 @@
+'use client'
 import Navbar from '@/components/front/navbar'
+import { usePathname } from 'next/navigation'
 
 export default function FrontLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isBlogPage = pathname.startsWith('/blog')
+
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-background">
-      <Navbar />
-      <main className="flex-1 min-h-0 relative overflow-y-auto">
+    <>
+      {!isBlogPage && <Navbar />}
+      <main>
         {children}
       </main>
-    </div>
+    </>
   )
 }

@@ -1,10 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import { useClerk } from '@clerk/nextjs'
 import {
   LayoutDashboard, Link2, BarChart3, Megaphone, CreditCard,
   ArrowDownToLine, Settings, LogOut, Zap, Users, MessageSquare, ChevronRight,
+  HardDrive, FileText, PenSquare, Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ const navSections = [
       { href: '/links', icon: Link2, label: 'My Links' },
       { href: '/campaigns', icon: Megaphone, label: 'Campaigns' },
       { href: '/tools', icon: Zap, label: 'Tools' },
+      { href: '/uploads', icon: HardDrive, label: 'Uploads' },
     ],
   },
   {
@@ -45,6 +47,14 @@ const navSections = [
       { href: '/settings', icon: Settings, label: 'Settings' },
     ],
   },
+  {
+    label: 'Content',
+    items: [
+      { href: '/posts', icon: FileText, label: 'My Posts', exact: true },
+      { href: '/posts/new', icon: PenSquare, label: 'Write Post' },
+      { href: '/posts/trash', icon: Trash2, label: 'Trash' },
+    ],
+  },
 ]
 
 interface SidebarProps {
@@ -56,6 +66,7 @@ interface SidebarProps {
 
 export default function DashboardSidebar({ user, balance, collapsed = false, onCollapseChange }: SidebarProps) {
   const pathname = usePathname()
+  const { signOut } = useClerk()
 
   const isActive = (href: string, exact = false) =>
     exact ? pathname === href : pathname.startsWith(href)
@@ -167,7 +178,7 @@ export default function DashboardSidebar({ user, balance, collapsed = false, onC
           variant="ghost"
           size="sm"
           className={cn('w-full justify-start text-xs text-muted-foreground hover:text-destructive gap-2', slim && 'justify-center px-0')}
-          onClick={() => signOut({ callbackUrl: '/' })}
+          onClick={() => signOut({ redirectUrl: '/' })}
           title={slim ? 'Sign Out' : undefined}
         >
           <LogOut className="w-3.5 h-3.5" />
@@ -215,7 +226,7 @@ export default function DashboardSidebar({ user, balance, collapsed = false, onC
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ callbackUrl: '/' })}>
+              <DropdownMenuItem className="text-xs text-destructive cursor-pointer" onClick={() => signOut({ redirectUrl: '/' })}>
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const schema = z.object({
   amount: z.number().positive(),
-  method: z.enum(['paypal', 'bank', 'crypto']),
+  method: z.enum(['paypal', 'bank', 'crypto', 'razorpay']),
   accountDetails: z.string().min(5),
 })
 

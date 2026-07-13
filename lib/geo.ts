@@ -1,11 +1,20 @@
 /**
  * Lightweight IP-to-country resolution.
- * Uses geoip-lite (MaxMind GeoLite2 bundled).
- * Falls back to "Others" on any error.
+ *
+ * On Vercel, the platform injects an `x-vercel-ip-country` header containing
+ * the ISO 3166-1 alpha-2 country code — no binary GeoIP DB needed.
+ * Locally (or on other hosts) we fall back to geoip-lite if available,
+ * otherwise return "Others".
  */
-export function getCountryFromIp(ip: string): string {
+export function getCountryFromIp(ip: string, headers?: Headers): string {
+  // 1. Prefer Vercel's injected country header (free, accurate, no binary DB)
+  if (headers) {
+    const vercelCountry = headers.get('x-vercel-ip-country')
+    if (vercelCountry) return vercelCountry
+  }
+
+  // 2. Local dev fallback: try geoip-lite (may not be available in all envs)
   try {
-    // geoip-lite is a CommonJS module — dynamic require is fine on the server
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const geoip = require('geoip-lite') as {
       lookup: (ip: string) => { country: string } | null

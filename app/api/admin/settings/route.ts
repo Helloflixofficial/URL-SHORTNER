@@ -19,8 +19,11 @@ const ALLOWED_KEYS = new Set([
   'mail_driver', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_encryption',
   'google_client_id', 'google_client_secret',
   'facebook_app_id', 'facebook_app_secret',
-  'footer_text', 'custom_css', 'custom_js_header',
+  'footer_text', 'custom_css', 'custom_js_header', 'blog_custom_theme',
+  'ads_blog_interstitial_enabled', 'ads_blog_interstitial_timer', 'ads_blog_interstitial_steps',
 ])
+
+
 
 export async function POST(req: NextRequest) {
   if (!(await requireAdminSession()))

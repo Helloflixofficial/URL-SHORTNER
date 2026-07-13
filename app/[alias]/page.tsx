@@ -71,61 +71,28 @@ export default async function AliasPage({ params }: AliasPageProps) {
 
   // Determine ad type
   const adType = resolveAdType(activeLink.adType)
-  // Random → pick between 1 (interstitial) and 2 (banner)
-  // Direct or no-ad
-  if (adType === 0) await redirectWithUnpaidHit(adType)
 
-  // Get paid ad data
-  const adData = await getPaidAds(adType, device, country)
-  adData.alias = alias
+  // Redirect visitors through random blog posts (Blog Post Interstitial)
+  const postCount = await prisma.post.count({ where: { status: 'published' } })
+  if (postCount > 0) {
+    const skip = Math.floor(Math.random() * postCount)
+    const randomPost = await prisma.post.findFirst({
+      where: { status: 'published' },
+      skip: skip,
+      select: { slug: true },
+    })
+    if (randomPost) {
+      const adData = await getPaidAds(adType, device, country)
+      adData.alias = alias
+      const customTimer = await getOption('ads_blog_interstitial_timer', '25')
+      adData.timer = Number(customTimer)
+      adData.t = getRequestTimestamp()
+      const adFormDataEncoded = Buffer.from(JSON.stringify({ ...adData, country, adType })).toString('base64')
 
-  // CAPTCHA settings
-  const enableCaptcha = await getOption('enable_captcha', 'no')
-  const captchaType = await getOption('captcha_type', 'recaptcha')
-  const captchaSiteKey = await getOption(captchaType === 'recaptcha' ? 'recaptcha_site_key' : 'hcaptcha_site_key', '')
-
-  // Timer from user plan (default 5s)
-  const userPlan = await prisma.userPlan.findUnique({
-    where: { userId: activeLink.userId },
-    include: { plan: true },
-  })
-  const timer = userPlan?.plan.timer ?? 15
-  adData.timer = timer
-  adData.t = getRequestTimestamp()
-
-  // Encode ad form data for client
-  const adFormDataEncoded = Buffer.from(JSON.stringify({ ...adData, country, adType })).toString('base64')
-
-  // Banner ads
-  if (adType === 2) {
-    const banner728 = await getOption('banner_728x90', '')
-    const banner468 = await getOption('banner_468x60', '')
-    const banner336 = await getOption('banner_336x280', '')
-    return (
-      <BannerPage
-        link={{ url: link.url, alias: link.alias, title: link.title ?? '' }}
-        adFormDataEncoded={adFormDataEncoded}
-        timer={timer}
-        banner728={banner728}
-        banner468={banner468}
-        banner336={banner336}
-        captcha={{ enabled: enableCaptcha === 'yes', type: captchaType, siteKey: captchaSiteKey }}
-      />
-    )
+      redirect(`/blog/${randomPost.slug}?alias=${alias}&step=1&data=${adFormDataEncoded}`)
+    }
   }
 
-  // Interstitial ads (default)
-  const interstitialAd = await getOption('interstitial_banner_ad', '')
-  const interstitialUrl = adData.websiteUrl ?? ''
-
-  return (
-    <InterstitialPage
-      link={{ url: link.url, alias: link.alias, title: link.title ?? '' }}
-      adFormDataEncoded={adFormDataEncoded}
-      timer={timer}
-      interstitialBannerAd={interstitialAd}
-      interstitialAdUrl={interstitialUrl}
-      captcha={{ enabled: enableCaptcha === 'yes', type: captchaType, siteKey: captchaSiteKey }}
-    />
-  )
+  // Fallback: direct redirect if no published posts exist
+  await redirectWithUnpaidHit(adType)
 }

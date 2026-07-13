@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -75,14 +74,11 @@ async function main() {
 
   // ---------- Owner user ----------
   const ownerEmail = process.env.OWNER_EMAIL ?? process.env.ADMIN_EMAIL ?? 'owner@linksite.io'
-  const ownerPlainPassword = process.env.OWNER_PASSWORD ?? process.env.ADMIN_PASSWORD ?? 'Owner@123456'
-  const ownerPassword = await bcrypt.hash(ownerPlainPassword, 12)
   await prisma.user.deleteMany({});
   const owner = await prisma.user.create({
     data: {
       username: 'owner',
       email: ownerEmail,
-      password: ownerPassword,
       role: 'owner',
       status: 'active',
       balance: 0,
@@ -91,13 +87,11 @@ async function main() {
   console.log('✅ Owner user:', owner.email)
 
   // ---------- Anonymous user (userId = 1 convention) ----------
-  const anonPassword = await bcrypt.hash('anonymous_no_login_' + Math.random(), 12)
   await prisma.user.create({
     data: {
       id: '000000000000000000000001',
       username: 'anonymous',
       email: 'anonymous@linksite.io',
-      password: anonPassword,
       role: 'member',
       status: 'active',
       balance: 0,
@@ -197,10 +191,80 @@ async function main() {
   })
   console.log('✅ Pages seeded')
 
+  // ---------- Seeding Payment Methods ----------
+  const paymentMethods = [
+    {
+      key: 'paypal',
+      name: 'PayPal',
+      type: 'both',
+      details: 'Send payment to <strong>payments@linksite.com</strong>',
+      inputLabel: 'PayPal Email',
+      minAmount: 5,
+      maxAmount: 1000,
+      isEnabled: true
+    },
+    {
+      key: 'payeer',
+      name: 'Payeer',
+      type: 'both',
+      details: 'Send payment to <strong>P12345678</strong>',
+      inputLabel: 'Payeer Account (PXXXX)',
+      minAmount: 10,
+      maxAmount: 1000,
+      isEnabled: true
+    },
+    {
+      key: 'bank',
+      name: 'Bank Transfer',
+      type: 'both',
+      details: 'Account Name: Linksite INC<br>IBAN: US12 3456 7890 1234',
+      inputLabel: 'Transaction Reference / Bank Details',
+      minAmount: 50,
+      maxAmount: 1000,
+      isEnabled: true
+    },
+    {
+      key: 'crypto',
+      name: 'Crypto (USDT)',
+      type: 'both',
+      details: 'Network: TRC20<br>Address: <strong>TXXXXX....XXXXX</strong>',
+      inputLabel: 'Transaction Hash (TXID) / Wallet Address',
+      minAmount: 10,
+      maxAmount: 1000,
+      isEnabled: true
+    },
+    {
+      key: 'razorpay',
+      name: 'Razorpay',
+      type: 'both',
+      details: 'Use Razorpay to add funds instantly or enter your UPI ID / Account details for payouts.',
+      inputLabel: 'UPI ID or Bank Account Details',
+      minAmount: 5,
+      maxAmount: 1000,
+      isEnabled: true
+    }
+  ]
+
+  for (const m of paymentMethods) {
+    await prisma.paymentMethod.upsert({
+      where: { key: m.key },
+      update: {
+        name: m.name,
+        type: m.type,
+        details: m.details,
+        inputLabel: m.inputLabel,
+        minAmount: m.minAmount,
+        maxAmount: m.maxAmount,
+        isEnabled: m.isEnabled
+      },
+      create: m
+    })
+  }
+  console.log('✅ Payment methods seeded')
+
   console.log('\n🎉 Database seeded successfully!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log(`Owner: ${ownerEmail}`)
-  console.log(`Password: ${ownerPlainPassword}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 

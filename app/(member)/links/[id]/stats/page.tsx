@@ -29,7 +29,7 @@ export default async function LinkStatsPage({ params }: { params: Promise<{ id: 
     }),
   ])
 
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXTAUTH_URL ?? 'http://localhost:3000'
 
   return (
     <div className="space-y-6">

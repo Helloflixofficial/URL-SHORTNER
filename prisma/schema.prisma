@@ -62,12 +62,19 @@ enum PageStatus {
   draft
 }
 
+enum PostStatus {
+  draft
+  published
+  scheduled
+  trashed
+}
+
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId      String?          @unique
   username         String           @unique
   email            String           @unique
   emailVerified    DateTime?
-  password         String?
   apiToken         String?          @default(cuid())
   role             UserRole         @default(member)
   status           UserStatus       @default(active)
@@ -80,8 +87,6 @@ model User {
   avatar           String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
-  resetToken       String?
-  resetTokenExpiry DateTime?
 
   // Profile Information
   firstName        String?
@@ -101,9 +106,9 @@ model User {
   withdrawals      Withdrawal[]
   invoices         Invoice[]
   tickets          Ticket[]
-  socialProfiles   SocialProfile[]
-  rememberTokens   RememberToken[]
   userPlan         UserPlan?
+  payments         Payment[]
+  posts            Post[]           @relation("UserPosts")
   referrer User? @relation("Referrals", fields: [referralId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   referrals        User[]           @relation("Referrals")
 }
@@ -243,13 +248,34 @@ model Invoice {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   amount    Float
-  method    String   @default("paypal")
+  method    String   @default("razorpay")
   status    Int      @default(0) // 0=pending,1=paid,2=failed,3=refunded
   meta      String?  // JSON metadata (txn id, etc.)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user      User     @relation(fields: [userId], references: [id])
+  payments  Payment[]
+}
+
+model Payment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  invoiceId String? @db.ObjectId
+  razorpayOrderId String @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount Float
+  currency String @default("INR")
+  status String @default("created")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
+
+  @@index([userId])
+  @@index([invoiceId])
 }
 
 model Page {
@@ -262,17 +288,63 @@ model Page {
   updatedAt   DateTime @updatedAt
 }
 
+// ─── Posts / Blog CMS ───
+
+model PostCategory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String   @unique
+  postCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
+}
+
+model PostTag {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  slug      String   @unique
+  postCount Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
 model Post {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  slug        String   @unique
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String     @unique
   title       String
   excerpt     String?
-  content     String
-  image       String?
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  content     String     // HTML from WYSIWYG editor
+  image       String?    // Featured image URL
+  status      PostStatus @default(draft)
+  authorId    String?    @db.ObjectId
+  authorName  String?    // Denormalized author display name
+  categoryId  String?    @db.ObjectId
+  tags        String[]   // Array of tag names (denormalized for easy querying)
+  metaTitle   String?    // SEO meta title
+  metaDesc    String?    // SEO meta description
+  focusKw     String?    // SEO focus keyword
+  views       Int        @default(0)
+  wordCount   Int        @default(0)
+  readingTime Int        @default(0) // estimated reading time in minutes
+  featured    Boolean    @default(false)
+  allowComments Boolean  @default(true)
+  scheduledAt DateTime?  // for scheduled posts
+  publishedAt DateTime?
+  trashedAt   DateTime?
+  customTheme String?    // Custom HTML theme template
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  author   User?         @relation("UserPosts", fields: [authorId], references: [id])
+  category PostCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([authorId])
+  @@index([status])
+  @@index([categoryId])
+  @@index([createdAt])
 }
+
+// ─── End Posts / Blog CMS ───
 
 model Testimonial {
   id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -339,25 +411,4 @@ model PaymentMethod {
   isEnabled   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model SocialProfile {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  provider   String
-  providerId String
-  createdAt  DateTime @default(now())
-
-  user       User     @relation(fields: [userId], references: [id])
-
-  @@unique([provider, providerId])
-}
-
-model RememberToken {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
 }

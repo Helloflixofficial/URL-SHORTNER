@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { signOut } from 'next-auth/react'
+import { useClerk } from '@clerk/nextjs'
 import Link from 'next/link'
 
 interface AdminTopbarProps {
@@ -22,6 +22,8 @@ interface AdminTopbarProps {
 }
 
 export default function AdminTopbar({ user, title, pendingCount = 0, onToggleSidebar }: AdminTopbarProps) {
+  const { signOut } = useClerk()
+
   return (
     <div className="topbar w-full hidden md:flex">
       {/* Left: sidebar toggle + title */}
@@ -103,7 +105,7 @@ export default function AdminTopbar({ user, title, pendingCount = 0, onToggleSid
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-xs text-destructive focus:text-destructive cursor-pointer"
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => signOut({ redirectUrl: '/' })}
             >
               Sign Out
             </DropdownMenuItem>

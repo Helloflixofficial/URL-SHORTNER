@@ -97,8 +97,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await prisma.invoice.deleteMany({ where: { userId: id } })
     await prisma.ticket.deleteMany({ where: { userId: id } })
     await prisma.link.deleteMany({ where: { userId: id } })
-    await prisma.socialProfile.deleteMany({ where: { userId: id } })
-    await prisma.rememberToken.deleteMany({ where: { userId: id } })
     await prisma.userPlan.deleteMany({ where: { userId: id } })
 
     // 4. Finally delete the user

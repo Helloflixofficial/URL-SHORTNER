@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useClerk } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { User, Lock, CreditCard, MapPin, Save, ShieldAlert, ChevronRight } from 'lucide-react'
+import { User, Lock, CreditCard, MapPin, Save, ShieldAlert, ChevronRight, ExternalLink } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -26,17 +27,17 @@ const TABS = [
   { id: 'profile', label: 'Profile Information', icon: User, desc: 'Update username and contact info' },
   { id: 'payout', label: 'Withdrawal Settings', icon: CreditCard, desc: 'Manage payment method and accounts' },
   { id: 'billing', label: 'Billing Address', icon: MapPin, desc: 'Your personal billing and location info' },
-  { id: 'security', label: 'Security', icon: Lock, desc: 'Change password and secure account' },
+  { id: 'security', label: 'Security', icon: Lock, desc: 'Manage sign-in and account security' },
 ]
 
 export default function SettingsForm({ user }: Props) {
   const router = useRouter()
+  const { openUserProfile } = useClerk()
   const [activeTab, setActiveTab] = useState('profile')
   const [saving, setSaving] = useState(false)
 
   // Profile Form States
   const [username, setUsername] = useState(user.username)
-  const [email, setEmail] = useState(user.email)
   const [disableEarnings, setDisableEarnings] = useState(user.disableEarnings)
   
   // Billing Form States
@@ -51,10 +52,6 @@ export default function SettingsForm({ user }: Props) {
   const [withdrawalMethod, setWithdrawalMethod] = useState(user.withdrawalMethod || 'paypal')
   const [withdrawalAccount, setWithdrawalAccount] = useState(user.withdrawalAccount || '')
 
-  // Password Form States
-  const [oldPass, setOldPass] = useState('')
-  const [newPass, setNewPass] = useState('')
-
   const saveProfile = async () => {
     setSaving(true)
     try {
@@ -62,7 +59,7 @@ export default function SettingsForm({ user }: Props) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          username, email, disableEarnings,
+          username, disableEarnings,
           firstName, lastName, address1, address2,
           city, state, zip, country,
           withdrawalMethod, withdrawalAccount
@@ -74,34 +71,6 @@ export default function SettingsForm({ user }: Props) {
       router.refresh()
     } catch (e: unknown) { 
       toast.error(e instanceof Error ? e.message : 'Failed to save settings') 
-    } finally { 
-      setSaving(false) 
-    }
-  }
-
-  const changePassword = async () => {
-    if (!oldPass || !newPass) { 
-      toast.error('Please enter both current and new passwords')
-      return 
-    }
-    if (newPass.length < 8) { 
-      toast.error('New password must be at least 8 characters')
-      return 
-    }
-    setSaving(true)
-    try {
-      const res = await fetch('/api/member/settings/password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oldPassword: oldPass, newPassword: newPass }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-      toast.success('Password changed successfully!')
-      setOldPass('')
-      setNewPass('')
-    } catch (e: unknown) { 
-      toast.error(e instanceof Error ? e.message : 'Failed to change password') 
     } finally { 
       setSaving(false) 
     }
@@ -216,9 +185,9 @@ export default function SettingsForm({ user }: Props) {
                       <Input 
                         id="email"
                         type="email"
-                        value={email} 
-                        onChange={e => setEmail(e.target.value)} 
-                        className="h-11 glass border-border/50 bg-muted/20 focus:bg-background"
+                        value={user.email}
+                        readOnly
+                        className="h-11 glass border-border/50 bg-muted/20"
                       />
                     </div>
                   </div>
@@ -272,6 +241,7 @@ export default function SettingsForm({ user }: Props) {
                           <SelectItem value="payeer">Payeer</SelectItem>
                           <SelectItem value="bank">Direct Bank Wire</SelectItem>
                           <SelectItem value="crypto">Tether USDT (TRC-20)</SelectItem>
+                          <SelectItem value="razorpay">Razorpay</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -283,7 +253,7 @@ export default function SettingsForm({ user }: Props) {
                         value={withdrawalAccount} 
                         onChange={e => setWithdrawalAccount(e.target.value)} 
                         rows={4}
-                        placeholder="For PayPal: Enter email address&#10;For Bank Wire: Enter Routing, IBAN, and Beneficiary&#10;For Tether: Enter your TRC-20 address"
+                        placeholder="For PayPal: Enter email address&#10;For Bank Wire: Enter Routing, IBAN, and Beneficiary&#10;For Tether: Enter your TRC-20 address&#10;For Razorpay: Enter your UPI ID or Bank Details (Account Number & IFSC)"
                         className="glass border-border/50 bg-muted/20 resize-none font-mono text-xs focus:bg-background"
                       />
                     </div>
@@ -408,39 +378,21 @@ export default function SettingsForm({ user }: Props) {
               {/* SECURITY TAB */}
               {activeTab === 'security' && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 gap-5 max-w-xl">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="old-pass" className="font-semibold">Current Password</Label>
-                      <Input 
-                        id="old-pass"
-                        type="password" 
-                        value={oldPass} 
-                        onChange={e => setOldPass(e.target.value)} 
-                        className="h-11 glass border-border/50 bg-muted/20 focus:bg-background" 
-                      />
-                    </div>
-                    
-                    <div className="space-y-1.5">
-                      <Label htmlFor="new-pass" className="font-semibold">New Password</Label>
-                      <Input 
-                        id="new-pass"
-                        type="password" 
-                        value={newPass} 
-                        onChange={e => setNewPass(e.target.value)} 
-                        className="h-11 glass border-border/50 bg-muted/20 focus:bg-background" 
-                      />
-                      <p className="text-[10px] text-muted-foreground">Password must contain at least 8 characters.</p>
-                    </div>
+                  <div className="max-w-xl rounded-2xl border border-border/30 bg-muted/20 p-5">
+                    <h3 className="font-bold text-sm">Clerk account security</h3>
+                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                      Passwords, connected Google account, email addresses, and active sessions are managed by Clerk.
+                    </p>
                   </div>
 
                   {/* Actions */}
                   <div className="pt-4 border-t border-border/30 flex justify-end">
                     <Button 
-                      onClick={changePassword} 
+                      onClick={() => openUserProfile()} 
                       disabled={saving} 
                       className="btn-glow gradient-bg-primary text-primary-foreground min-w-[140px]"
                     >
-                      {saving ? 'Updating...' : <><Save className="w-4 h-4 mr-2" />Change Password</>}
+                      <ExternalLink className="w-4 h-4 mr-2" />Open Account Security
                     </Button>
                   </div>
                 </div>

@@ -1,4 +1,20 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ─── Blog light mode (toggled via data-blog-theme="light") ─── */
+[data-blog-theme="light"] .blog-prose {
+  --tw-prose-body: #1e1b2e;
+  --tw-prose-headings: #0f0d1a;
+  --tw-prose-links: #7c3aed;
+  --tw-prose-bold: #0f0d1a;
+  --tw-prose-code: #6d28d9;
+  --tw-prose-pre-bg: #f4f0ff;
+  --tw-prose-quotes: #4c1d95;
+}
+[data-blog-theme="light"] article {
+  background-color: #f8f7ff;
+  color: #1e1b2e;
+}
 
 @theme {
   /* ─── Backgrounds ─── */
@@ -147,6 +163,16 @@ body {
   50% { transform: translateY(-12px); }
 }
 .float-anim { animation: float 4s ease-in-out infinite; }
+
+/* ─── Dropdown enter animation (navbar user menu) ─── */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.dropdown-enter {
+  animation: dropdown-in 0.18s cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin: top right;
+}
 
 /* ─── Shimmer skeleton ─── */
 @keyframes shimmer {

@@ -1,5 +1,4 @@
 const { PrismaClient } = require('@prisma/client')
-const bcrypt = require('bcryptjs')
 
 const prisma = new PrismaClient()
 
@@ -14,14 +13,26 @@ async function main() {
 
   // Owner user
   const ownerEmail = process.env.OWNER_EMAIL || process.env.ADMIN_EMAIL || 'owner@linksite.io'
-  const ownerPassword = process.env.OWNER_PASSWORD || process.env.ADMIN_PASSWORD || 'Owner@123456'
-  const ownerPass = await bcrypt.hash(ownerPassword, 12)
-  const owner = await prisma.user.upsert({ where: { email: ownerEmail }, update: { role: 'owner', password: ownerPass, status: 'active' }, create: { username: 'owner', email: ownerEmail, password: ownerPass, role: 'owner', status: 'active', balance: 0 } })
+  const owner = await prisma.user.upsert({
+    where: { email: ownerEmail },
+    update: { role: 'owner', status: 'active' },
+    create: { username: 'owner', email: ownerEmail, role: 'owner', status: 'active', balance: 0 },
+  })
   console.log('✅ Owner:', owner.email)
 
   // Anonymous user
-  const anonPass = await bcrypt.hash('anon_' + Math.random(), 12)
-  await prisma.user.upsert({ where: { email: 'anonymous@linksite.io' }, update: {}, create: { username: 'anonymous', email: 'anonymous@linksite.io', password: anonPass, role: 'member', status: 'active', balance: 0, disableEarnings: true } })
+  await prisma.user.upsert({
+    where: { email: 'anonymous@linksite.io' },
+    update: {},
+    create: {
+      username: 'anonymous',
+      email: 'anonymous@linksite.io',
+      role: 'member',
+      status: 'active',
+      balance: 0,
+      disableEarnings: true,
+    },
+  })
   console.log('✅ Anonymous user created')
 
   // Default options
@@ -44,13 +55,35 @@ async function main() {
   }
   console.log('✅ Default options seeded')
 
+  await prisma.paymentMethod.upsert({
+    where: { key: 'razorpay' },
+    update: {
+      name: 'Razorpay',
+      type: 'deposit',
+      minAmount: 5,
+      isEnabled: true,
+      details: 'Use Razorpay to add funds instantly with secure checkout.',
+      inputLabel: '',
+    },
+    create: {
+      name: 'Razorpay',
+      key: 'razorpay',
+      type: 'deposit',
+      minAmount: 5,
+      isEnabled: true,
+      details: 'Use Razorpay to add funds instantly with secure checkout.',
+      inputLabel: '',
+    },
+  })
+  console.log('✅ Razorpay payment method seeded')
+
   // Testimonials
   for (const t of [
     { name: 'Alex Johnson', text: "Linksite has been a game changer! I earn passive income from my blog links every day.", rating: 5 },
     { name: 'Sarah Williams', text: "The analytics dashboard is stunning and payouts are always on time. Love it!", rating: 5 },
     { name: 'Mike Chen', text: "Best CPM rates I've found. Withdrew my first payment within 2 weeks.", rating: 5 },
   ]) {
-    try { await prisma.testimonial.create({ data: { ...t, published: true } }) } catch {}
+    try { await prisma.testimonial.create({ data: { ...t, published: true } }) } catch { }
   }
   console.log('✅ Testimonials seeded')
 
@@ -67,7 +100,6 @@ async function main() {
   console.log('\n🎉 Done!')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log(`Owner: ${ownerEmail}`)
-  console.log(`Password: ${ownerPassword}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━')
 }
 
