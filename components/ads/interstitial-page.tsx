@@ -71,7 +71,8 @@ export default function InterstitialPage({
   const circumference = 2 * Math.PI * 38
   const dashOffset = circumference - (circumference * (timer - countdown)) / (timer || 1)
 
-  const blogUrl = interstitialAdUrl || 'https://helloflix.in'
+  const blogUrl = interstitialAdUrl || '/blog'
+
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background">
