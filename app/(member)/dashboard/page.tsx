@@ -185,11 +185,10 @@ export default async function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black font-display">
-            Welcome back,{" "}
-            <span className="gradient-text">{user?.username}</span> 👋
+            User <span className="gradient-text">Dashboard</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Here&apos;s your performance overview
+            Welcome back, {user?.username}! Here&apos;s your performance overview
           </p>
         </div>
         <Button

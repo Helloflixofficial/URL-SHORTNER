@@ -4,10 +4,14 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Users, Link2, DollarSign, ArrowDownToLine, TrendingUp, Eye, Megaphone, CreditCard, MessageSquare, Activity } from 'lucide-react'
 import AdminCharts from '@/components/admin/admin-charts'
+import { auth } from '@/lib/auth'
 
 export const metadata = { title: 'Admin Dashboard' }
 
 export default async function AdminDashboardPage() {
+  const session = await auth()
+  const role = session?.user?.role || 'admin'
+
   const [
     totalUsers, totalLinks, totalClicks, totalWithdrawals, pendingWithdrawals,
     totalEarnings, rawDailyStats, last24hClicks, pendingInvoices,
@@ -90,7 +94,7 @@ export default async function AdminDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black font-display">
-            Admin <span className="gradient-text">Dashboard</span>
+            {role === 'owner' ? 'Owner' : 'Admin'} <span className="gradient-text">Dashboard</span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">Platform-wide overview</p>
         </div>
