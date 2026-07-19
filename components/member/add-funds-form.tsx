@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -200,7 +201,7 @@ export default function AddFundsForm({ methods }: Props) {
           </p>
           <div
             className="text-xs text-muted-foreground leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: selectedMethod.details }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedMethod.details) }}
           />
         </div>
       )}

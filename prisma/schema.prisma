@@ -158,6 +158,8 @@ model Statistic {
   @@index([userId])
   @@index([createdAt])
   @@index([country])
+  @@index([userId, ip, reason, createdAt]) // Compound: unique visit check in calcEarnings()
+  @@index([ip, createdAt]) // Compound: rate-limiting & analytics
 }
 
 model Campaign {
@@ -342,6 +344,8 @@ model Post {
   @@index([status])
   @@index([categoryId])
   @@index([createdAt])
+  @@index([status, publishedAt]) // Compound: blog listing sorted by publish date
+  @@index([status, views]) // Compound: trending/popular posts query
 }
 
 // ─── End Posts / Blog CMS ───

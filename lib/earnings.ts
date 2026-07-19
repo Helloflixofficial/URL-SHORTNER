@@ -102,23 +102,25 @@ export async function calcEarnings(
   const redirectUrl = link.url
 
   async function recordAndReturn(reason: number, publisherPrice = 0, advertiserPrice = 0) {
-    await prisma.statistic.create({
-      data: {
-        linkId: link.id,
-        userId: link.userId,
-        ip,
-        country: data.country,
-        device: 2,
-        adType,
-        reason,
-        publisherPrice,
-        advertiserPrice,
-        campaignId: data.ci || null,
-        campaignUserId: data.cui || null,
-        campaignItemId: data.cii || null,
-      },
-    })
-    await prisma.link.update({ where: { id: link.id }, data: { hits: { increment: 1 } } })
+    await prisma.$transaction([
+      prisma.statistic.create({
+        data: {
+          linkId: link.id,
+          userId: link.userId,
+          ip,
+          country: data.country,
+          device: 2,
+          adType,
+          reason,
+          publisherPrice,
+          advertiserPrice,
+          campaignId: data.ci || null,
+          campaignUserId: data.cui || null,
+          campaignItemId: data.cii || null,
+        },
+      }),
+      prisma.link.update({ where: { id: link.id }, data: { hits: { increment: 1 } } }),
+    ])
     return { status: 'success' as const, message: '', url: redirectUrl }
   }
 

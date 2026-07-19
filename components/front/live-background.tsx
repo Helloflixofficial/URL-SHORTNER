@@ -1,16 +1,31 @@
 'use client'
 
-import { useCallback } from 'react'
-import Particles from 'react-tsparticles'
-import { loadSlim } from 'tsparticles-slim'
+import dynamic from 'next/dynamic'
+import { useCallback, useEffect, useState } from 'react'
 import type { Engine } from 'tsparticles-engine'
 
+const Particles = dynamic(() => import('react-tsparticles'), { ssr: false })
+
 export default function LiveBackground() {
+  const [shouldRender, setShouldRender] = useState(false)
+
+  useEffect(() => {
+    // Skip particles entirely on low-memory devices (< 4GB RAM)
+    const memory = (navigator as unknown as { deviceMemory?: number }).deviceMemory
+    if (memory && memory < 4) return
+
+    // Also skip if user prefers reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    setShouldRender(true)
+  }, [])
+
   const particlesInit = useCallback(async (engine: Engine) => {
-    // loadSlim loads the slim version of tsparticles which includes
-    // the basic shapes and animations but is lighter than the full package
+    const { loadSlim } = await import('tsparticles-slim')
     await loadSlim(engine)
   }, [])
+
+  if (!shouldRender) return null
 
   return (
     <Particles
@@ -24,7 +39,7 @@ export default function LiveBackground() {
             value: 'transparent',
           },
         },
-        fpsLimit: 120,
+        fpsLimit: 30,
         interactivity: {
           events: {
             onHover: {
@@ -67,7 +82,7 @@ export default function LiveBackground() {
               enable: true,
               area: 800,
             },
-            value: 80,
+            value: 30,
           },
           opacity: {
             value: 0.5,
