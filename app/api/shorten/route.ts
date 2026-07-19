@@ -50,9 +50,15 @@ export async function POST(req: NextRequest) {
     // Check disallowed domains
     const disallowedRaw = await getOption('disallowed_domains', '')
     if (disallowedRaw) {
-      const disallowed = disallowedRaw.split(',').map((d) => d.trim().toLowerCase())
+      const disallowed = disallowedRaw
+        .split(',')
+        .map((d) => d.trim().toLowerCase())
+        .filter(Boolean)
       const host = new URL(url).hostname.toLowerCase()
-      if (disallowed.includes(host)) {
+      const isDisallowed = disallowed.some((domain) => {
+        return host === domain || host.endsWith(`.${domain}`)
+      })
+      if (isDisallowed) {
         return NextResponse.json({ error: 'This domain is not allowed' }, { status: 400 })
       }
     }
